@@ -1,121 +1,177 @@
+import { useState } from 'react'
 import './App.css'
 
 const guitars = [
-  {
-    name: 'Classic Acoustic FG-250',
-    price: '4.200.000 đ',
-    description: 'Âm thanh ấm, dành cho người mới học và trình diễn nhỏ.',
-    details: ['6 dây', 'Gỗ Mahogany', 'Phù hợp học tập'],
-  },
-  {
-    name: 'Electric Rock EX-100',
-    price: '8.500.000 đ',
-    description: 'Thiết kế mạnh mẽ, phù hợp cover nhạc rock và live show.',
-    details: ['6 dây', 'Pickups đôi', 'Phù hợp sân khấu'],
-  },
-  {
-    name: 'Ukulele Mini U-32',
-    price: '1.500.000 đ',
-    description: 'Nhỏ gọn, dễ cầm và rất hợp với người mới bắt đầu.',
-    details: ['4 dây', 'Dễ chơi', 'Âm thanh nhẹ nhàng'],
-  },
+  { id: 1, name: 'Guitar Acoustic Classic', price: 4200000, discount: 15, image: 'https://via.placeholder.com/280x320?text=Guitar+Acoustic' },
+  { id: 2, name: 'Guitar Dien Rock Pro', price: 8500000, discount: 0, image: 'https://via.placeholder.com/280x320?text=Guitar+Dien' },
+  { id: 3, name: 'Ukulele Mini Travel', price: 1500000, discount: 20, image: 'https://via.placeholder.com/280x320?text=Ukulele' },
+  { id: 4, name: 'Guitar 12 Day Acoust', price: 5800000, discount: 0, image: 'https://via.placeholder.com/280x320?text=Guitar+12' },
+]
+
+const categories = [
+  { name: 'Guitar Acoustic', slug: 'acoustic' },
+  { name: 'Guitar Dien', slug: 'electric' },
+  { name: 'Ukulele', slug: 'ukulele' },
+  { name: 'Phu Kien', slug: 'accessories' },
 ]
 
 function App() {
-  return (
-    <div className="app-shell">
-      <header className="hero-banner">
-        <div className="hero-copy">
-          <p className="eyebrow">P-Guitar Store</p>
-          <h1>Guitar đẹp, chất, dễ chơi cho mọi người</h1>
-          <p>
-            Trang web mẫu cho cửa hàng đàn guitar với giao diện đơn giản, rõ ràng và dễ chỉnh sửa.
-          </p>
-          <div className="hero-actions">
-            <a className="button button-primary" href="#products">
-              Xem sản phẩm
-            </a>
-            <a className="button button-secondary" href="#contact">
-              Liên hệ ngay
-            </a>
-          </div>
-        </div>
-        <div className="hero-card">
-          <span className="hero-tag">HOT</span>
-          <h2>Guitar acoustic bán chạy</h2>
-          <p>Thích hợp cho học sinh, sinh viên và người mới bắt đầu.</p>
-          <div className="hero-meta">
-            <span>6 dây</span>
-            <span>Âm ấm</span>
-            <span>Giá tốt</span>
-          </div>
-        </div>
-      </header>
+  const [userLogged, setUserLogged] = useState(false)
+  const [cartCount, setCartCount] = useState(0)
 
-      <main>
-        <section id="products" className="section section-products">
-          <div className="section-heading">
-            <p className="section-label">Bộ sưu tập</p>
-            <h2>Đàn guitar nổi bật</h2>
-            <p className="section-copy">
-              Chọn đàn phù hợp với phong cách của bạn: acoustic, electric hoặc ukulele.
-            </p>
+  const handleAddToCart = () => {
+    setCartCount(cartCount + 1)
+  }
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
+  }
+
+  return (
+    <div className="container-shell">
+      {/* HEADER */}
+      <header className="header">
+        <div className="header-top">
+          <div className="logo">
+            <div className="logo-img">P-Guitar</div>
           </div>
-          <div className="product-grid">
-            {guitars.map((guitar) => (
-              <article key={guitar.name} className="product-card">
-                <div className="product-badge">Guitar</div>
-                <h3>{guitar.name}</h3>
-                <p>{guitar.description}</p>
-                <ul className="product-details">
-                  {guitar.details.map((detail) => (
-                    <li key={detail}>{detail}</li>
-                  ))}
-                </ul>
-                <div className="product-footer">
-                  <span className="price">{guitar.price}</span>
-                  <button className="button button-primary">Mua ngay</button>
-                </div>
-              </article>
+          <div className="head-mid">
+            <form className="search-bar" onSubmit={(e) => e.preventDefault()}>
+              <input type="text" className="tim" placeholder="Tìm kiếm" />
+              <button type="submit" className="aicon">
+                <i className="fa fa-search"></i>
+              </button>
+            </form>
+            <div className="hotline-info">
+              <span className="hotline-label">Hotline</span>
+              <a href="tel:0334090425" className="hotline-number">0334 090 425</a>
+            </div>
+            {!userLogged ? (
+              <a href="#" className="login-link" onClick={(e) => { e.preventDefault(); setUserLogged(true); }}>
+                <i className="fa fa-sign-in"></i> Đăng nhập
+              </a>
+            ) : (
+              <div className="profile-wrapper">
+                <button className="avatar-btn">N</button>
+              </div>
+            )}
+            <div className="cart-icon-wrapper">
+              <a href="#" className="cart-link">
+                <i className="fa fa-shopping-cart"></i>
+                {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+              </a>
+            </div>
+          </div>
+        </div>
+        <nav className="navbar-custom">
+          <div className="nav-items">
+            {categories.map((cat) => (
+              <a key={cat.slug} href="#" className="nav-link">
+                {cat.name}
+              </a>
             ))}
           </div>
-        </section>
+        </nav>
+      </header>
 
-        <section className="section section-benefits">
-          <div className="section-heading">
-            <p className="section-label">Ưu điểm</p>
-            <h2>Tại sao chọn P-Guitar?</h2>
+      {/* HERO */}
+      <section className="hero-section">
+        <div className="hero-content">
+          <span className="hero-badge"><i className="fa fa-guitar"></i> P-Guitar</span>
+          <h1 className="hero-title">Âm nhạc thăng hoa cùng cây đàn</h1>
+          <p className="hero-description">Kham pha bo suu tap guitar va phu kien cao cap. Mua ngay de nhan uu dai dac biet, giao nhanh va bao hanh.</p>
+          <div className="hero-actions">
+            <a href="#featured" className="hero-btn">Mua ngay</a>
+            <a href="#" className="hero-btn hero-btn-secondary">Phụ kiện hot</a>
           </div>
-          <div className="benefit-grid">
-            <article className="benefit-card">
-              <h3>Chất lượng tốt</h3>
-              <p>Đàn được chọn lọc từ những thương hiệu có tiếng, đảm bảo âm thanh và độ bền.</p>
-            </article>
-            <article className="benefit-card">
-              <h3>Giá cả hợp lý</h3>
-              <p>Giá tốt cho học sinh, sinh viên và người mới chơi.</p>
-            </article>
-            <article className="benefit-card">
-              <h3>Hỗ trợ khách hàng</h3>
-              <p>Luôn sẵn sàng tư vấn chọn đàn và bảo hành nhanh chóng.</p>
-            </article>
-          </div>
-        </section>
-      </main>
-
-      <footer id="contact" className="footer">
-        <div>
-          <p className="section-label">Liên hệ</p>
-          <h2>Đặt mua hoặc hỏi thêm</h2>
-          <p>Gửi tin nhắn cho chúng tôi qua email hoặc điện thoại để nhận tư vấn nhanh.</p>
         </div>
-        <div className="contact-actions">
-          <a className="button button-primary" href="mailto:contact@p-guitar.com">
-            Email: contact@p-guitar.com
-          </a>
-          <a className="button button-secondary" href="tel:+84901234567">
-            Gọi: +84 901 234 567
-          </a>
+      </section>
+
+      {/* PROMO */}
+      <section className="promo-strip">
+        <div className="promo-card">
+          <h2>ƯU ĐÃI FLASH SALE</h2>
+          <p>Giam toi 25% cho nhung cay dan guitar hot nhat. Giao nhanh trong 24h.</p>
+        </div>
+      </section>
+
+      {/* CATEGORIES */}
+      <section className="category-shelf">
+        <div className="section-heading">
+          <h2>Danh muc noi bat</h2>
+        </div>
+        <div className="category-grid">
+          {categories.map((cat) => (
+            <a key={cat.slug} href="#" className="category-card">
+              <h3>{cat.name}</h3>
+              <p>Kham pha {cat.name.toLowerCase()}.</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* PRODUCTS */}
+      <section id="featured" className="product-grid">
+        <div className="content-head">
+          <h2>SAN PHAM MOI</h2>
+        </div>
+        <div className="products-container">
+          {guitars.map((guitar) => (
+            <div key={guitar.id} className="product-card-wrapper">
+              <div className="sanpham-card">
+                {guitar.discount > 0 && <div className="sale-badge">Giam {guitar.discount}%</div>}
+                <img src={guitar.image} alt={guitar.name} className="picture" />
+                <div className="card-body">
+                  <h5 className="card-title">{guitar.name}</h5>
+                  <p className="product-price">
+                    {guitar.discount > 0 ? (
+                      <>
+                        <span className="price-new">{formatPrice(guitar.price * (1 - guitar.discount / 100))}</span>
+                        <span className="price-old">{formatPrice(guitar.price)}</span>
+                      </>
+                    ) : formatPrice(guitar.price)}
+                  </p>
+                  <button className="add-to-cart-btn" onClick={handleAddToCart}>
+                    <i className="fa fa-cart-plus"></i> Them vao gio
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="footer">
+        <div className="footer-content">
+          <div className="footer-column">
+            <div className="logo-footer">P-Guitar</div>
+            <p><strong>P-Guitar</strong> - Noi dam me am nhac thang hoa.</p>
+            <p>Dia chi: Quan 1, Ho Chi Minh City</p>
+            <p>Dien thoai: <a href="tel:0334090425">0334 090 425</a></p>
+            <p>Email: <a href="mailto:shopguitar@gmail.com">shopguitar@gmail.com</a></p>
+          </div>
+          <div className="footer-column">
+            <h4>Dich vu khach hang</h4>
+            <ul>
+              <li>Ho tro 24/7</li>
+              <li>Doi tra nhanh chong</li>
+              <li>Giao hang toan quoc</li>
+              <li>Bao hanh tan tam</li>
+            </ul>
+          </div>
+          <div className="footer-column">
+            <h4>Lien he</h4>
+            <p>Theo doi uu dai va nhan tu van.</p>
+            <div className="social-icons">
+              <a href="#">Zalo</a>
+              <a href="#">Facebook</a>
+            </div>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p className="copy">© 2024 P-Guitar. Ban quyen thuoc ve P-Guitar.</p>
+          <p>Thiet ke website chuyen nghiep.</p>
         </div>
       </footer>
     </div>
