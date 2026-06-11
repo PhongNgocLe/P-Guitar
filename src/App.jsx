@@ -62,7 +62,9 @@ function App() {
       <header className="header">
         <div className="header-top">
           <div className="logo">
-            <div className="logo-img">P-Guitar</div>
+            <div className="logo-img" style={{ width: '40%', height: '100%' }}>
+              <img src="/src/assets/lg.png" alt="P-Guitar" />
+            </div>
           </div>
           <div className="head-mid">
             <form className="search-bar" onSubmit={(e) => e.preventDefault()}>
@@ -234,9 +236,11 @@ function App() {
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-column">
-            <div className="logo-footer">P-Guitar</div>
+            <div className="logo-footer" style={{ width: '80%', height: '100%' }}>
+              <img src="/src/assets/lg.png" alt="P-Guitar" />
+            </div>
             <p><strong>P-Guitar</strong> - Noi dam me am nhac thang hoa.</p>
-            <p>Dia chi: Quan 1, Ho Chi Minh City</p>
+            <p>Dia chi: 180 Cao Lo, Ho Chi Minh City</p>
             <p>Dien thoai: <a href="tel:0334090425">0334 090 425</a></p>
             <p>Email: <a href="mailto:shopguitar@gmail.com">shopguitar@gmail.com</a></p>
           </div>
@@ -253,14 +257,23 @@ function App() {
             <h4>Lien he</h4>
             <p>Theo doi uu dai va nhan tu van.</p>
             <div className="social-icons">
-              <a href="#">Zalo</a>
-              <a href="#">Facebook</a>
+              <a href="#"><img src="/src/assets/zalo.png" alt="Zalo" /></a>
+              <a href="#"><img src="/src/assets/fb.png" alt="Facebook" /></a>
             </div>
           </div>
         </div>
-        <div className="footer-bottom">
-          <p className="copy">© 2024 P-Guitar. Ban quyen thuoc ve P-Guitar.</p>
-        </div>
+      <div className="map-container">
+  <iframe
+    src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d692.9560881472422!2d106.67791069626654!3d10.738214421796897!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1svi!2s!4v1781178970027!5m2!1svi!2s"
+    width="100%"
+    height="100%"
+    style={{ border: 0 }}
+    allowFullScreen=""
+    loading="lazy"
+    referrerPolicy="no-referrer-when-downgrade"
+    title="Bản đồ địa chỉ P-Guitar"
+  ></iframe>
+</div>
       </footer>
     </div>
   )

@@ -1050,3 +1050,25 @@
     width: 100%;
   }
 }
+.map-container {
+  width: 100%;
+  height: 350px; /* Bạn có thể tùy chỉnh độ cao bản đồ tại đây */
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(245, 197, 24, 0.2); /* Viền màu vàng dịu */
+  background-color: var(--surface-light);
+  box-shadow: 0 0 15px rgba(245, 197, 24, 0.15); /* Hiệu ứng tỏa sáng nhẹ */
+  transition: all 0.3s ease;
+}
+
+.map-container:hover {
+  border-color: var(--brand);
+  box-shadow: 0 0 25px rgba(245, 197, 24, 0.4); /* Sáng mạnh hơn khi di chuột vào */
+}
+
+/* Tùy chỉnh responsive cho bản đồ trên điện thoại */
+@media (max-width: 768px) {
+  .map-container {
+    height: 250px;
+  }
+}
