@@ -2,10 +2,11 @@ import { useState } from 'react'
 import './App.css'
 
 const guitars = [
-  { id: 1, name: 'Guitar Acoustic Classic', price: 4200000, discount: 15, image: 'https://via.placeholder.com/280x320?text=Guitar+Acoustic' },
-  { id: 2, name: 'Guitar Dien Rock Pro', price: 8500000, discount: 0, image: 'https://via.placeholder.com/280x320?text=Guitar+Dien' },
-  { id: 3, name: 'Ukulele Mini Travel', price: 1500000, discount: 20, image: 'https://via.placeholder.com/280x320?text=Ukulele' },
-  { id: 4, name: 'Guitar 12 Day Acoust', price: 5800000, discount: 0, image: 'https://via.placeholder.com/280x320?text=Guitar+12' },
+  { id: 1, category: 'acoustic', name: 'Guitar Acoustic Classic', price: 4200000, discount: 15, image: 'src/assets/hero.png' },
+  { id: 2, category: 'electric', name: 'Guitar Dien Rock Pro', price: 8500000, discount: 0, image: 'src/assets/Guitar.jpg' },
+  { id: 3, category: 'ukulele', name: 'Ukulele Mini Travel', price: 1500000, discount: 20, image: 'src/assets/Guitar.jpg' },
+  { id: 4, category: 'acoustic', name: 'Guitar 12 Day Acoust', price: 5800000, discount: 0, image: 'src/assets/Guitar.jpg' },
+  { id: 5, category: 'accessories', name: 'Day dan chuyen nghiep', price: 320000, discount: 10, image: 'src/assets/Guitar.jpg' },
 ]
 
 const categories = [
@@ -15,9 +16,33 @@ const categories = [
   { name: 'Phu Kien', slug: 'accessories' },
 ]
 
+const productCategories = [{ name: 'Tat ca', slug: 'all' }, ...categories]
+
+const blogPosts = [
+  {
+    id: 1,
+    title: 'Cach lua chon guitar cho nguoi moi bat dau',
+    date: '12/06/2026',
+    excerpt: 'Huong dan chon guitar phu hop theo phong cach, am thanh va ngan sach.',
+  },
+  {
+    id: 2,
+    title: 'Bao quan dan va phu kien dung cach',
+    date: '05/06/2026',
+    excerpt: 'Bi quyet giu cho dan luon sang dep, danh cho nhung ai yeu am nhac.',
+  },
+  {
+    id: 3,
+    title: 'Top nhung phu kien can co cho nguoi choi guitar',
+    date: '28/05/2026',
+    excerpt: 'Danh gia nhung phu kien tot nhat giup ban tap luyen va bieu dien',
+  },
+]
+
 function App() {
   const [userLogged, setUserLogged] = useState(false)
   const [cartCount, setCartCount] = useState(0)
+  const [selectedCategory, setSelectedCategory] = useState('all')
 
   const handleAddToCart = () => {
     setCartCount(cartCount + 1)
@@ -26,6 +51,10 @@ function App() {
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
   }
+
+  const filteredGuitars = selectedCategory === 'all'
+    ? guitars
+    : guitars.filter((guitar) => guitar.category === selectedCategory)
 
   return (
     <div className="container-shell">
@@ -52,7 +81,7 @@ function App() {
               </a>
             ) : (
               <div className="profile-wrapper">
-                <button className="avatar-btn">N</button>
+                <button className="avatar-btn">P</button>
               </div>
             )}
             <div className="cart-icon-wrapper">
@@ -98,7 +127,7 @@ function App() {
       {/* CATEGORIES */}
       <section className="category-shelf">
         <div className="section-heading">
-          <h2>Danh muc noi bat</h2>
+          <h2>Danh muc <span>noi bat</span></h2>
         </div>
         <div className="category-grid">
           {categories.map((cat) => (
@@ -110,33 +139,93 @@ function App() {
         </div>
       </section>
 
-      {/* PRODUCTS */}
-      <section id="featured" className="product-grid">
-        <div className="content-head">
-          <h2>SAN PHAM MOI</h2>
+      {/* PRODUCT INTRO */}
+      <section className="product-intro">
+        <div className="section-heading">
+          <h2>Gioi thieu <span>san pham</span></h2>
+          <p>Khong chi la guitar, ma la trai nghiem am nhac chuyen nghiep voi san pham chat luong cao va phu kien hoan hao.</p>
+        </div>
+        <div className="intro-grid">
+          <article className="intro-card">
+            <h3>Am thanh tuyet voi</h3>
+            <p>Nhung cay dan duoc chon loc ky, thiet ke de mang den tiet tan am nhac trong treo va can doi.</p>
+          </article>
+          <article className="intro-card">
+            <h3>Chat luong cao cap</h3>
+            <p>Guitar va phu kien duoc cam ket dung vat lieu tot nhat, dam bao ben dep va on dinh.</p>
+          </article>
+          <article className="intro-card">
+            <h3>Trai nghiem khach hang</h3>
+            <p>Ho tro tu van chuyen nghiep va giao hang nhanh chong de ban co the bat dau tap ngay.</p>
+          </article>
+        </div>
+      </section>
+
+      {/* PRODUCTS - Class "product-grid" đã được đổi thành "products-section" để fix lỗi layout */}
+      <section id="featured" className="products-section">
+        <div className="section-heading">
+          <h2>SAN PHAM <span>MOI</span></h2>
+        </div>
+        <div className="filter-chips">
+          {productCategories.map((cat) => (
+            <button
+              key={cat.slug}
+              type="button"
+              className={`filter-chip ${selectedCategory === cat.slug ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(cat.slug)}
+            >
+              {cat.name}
+            </button>
+          ))}
         </div>
         <div className="products-container">
-          {guitars.map((guitar) => (
-            <div key={guitar.id} className="product-card-wrapper">
-              <div className="sanpham-card">
-                {guitar.discount > 0 && <div className="sale-badge">Giam {guitar.discount}%</div>}
-                <img src={guitar.image} alt={guitar.name} className="picture" />
-                <div className="card-body">
-                  <h5 className="card-title">{guitar.name}</h5>
-                  <p className="product-price">
-                    {guitar.discount > 0 ? (
-                      <>
-                        <span className="price-new">{formatPrice(guitar.price * (1 - guitar.discount / 100))}</span>
-                        <span className="price-old">{formatPrice(guitar.price)}</span>
-                      </>
-                    ) : formatPrice(guitar.price)}
-                  </p>
-                  <button className="add-to-cart-btn" onClick={handleAddToCart}>
-                    <i className="fa fa-cart-plus"></i> Them vao gio
-                  </button>
+          {filteredGuitars.length > 0 ? (
+            filteredGuitars.map((guitar) => (
+              <div key={guitar.id} className="product-card-wrapper">
+                <div className="sanpham-card">
+                  {guitar.discount > 0 && <div className="sale-badge">Giam {guitar.discount}%</div>}
+                  <img src={guitar.image} alt={guitar.name} className="picture" />
+                  <div className="card-body">
+                    <h5 className="card-title">{guitar.name}</h5>
+                    <p className="product-price">
+                      {guitar.discount > 0 ? (
+                        <>
+                          <span className="price-new">{formatPrice(guitar.price * (1 - guitar.discount / 100))}</span>
+                          <span className="price-old">{formatPrice(guitar.price)}</span>
+                        </>
+                      ) : (
+                        formatPrice(guitar.price)
+                      )}
+                    </p>
+                    <button className="add-to-cart-btn" onClick={handleAddToCart}>
+                      <i className="fa fa-cart-plus"></i> Them vao gio
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))
+          ) : (
+            <p className="no-results">Khong co san pham phu hop voi loai nay.</p>
+          )}
+        </div>
+      </section>
+
+      {/* BLOG */}
+      <section className="blog-section">
+        <div className="section-heading">
+          <h2>Blog <span>Am Nhac</span></h2>
+          <p>Cac bai viet moi nhat ve guitar, phu kien va kinh nghiem cho nguoi choi.</p>
+        </div>
+        <div className="blog-grid">
+          {blogPosts.map((post) => (
+            <article key={post.id} className="blog-card">
+              <div className="blog-card-content">
+                <span className="blog-date">{post.date}</span>
+                <h3>{post.title}</h3>
+                <p>{post.excerpt}</p>
+              </div>
+              <a href="#" className="blog-readmore">Xem them</a>
+            </article>
           ))}
         </div>
       </section>
@@ -171,7 +260,6 @@ function App() {
         </div>
         <div className="footer-bottom">
           <p className="copy">© 2024 P-Guitar. Ban quyen thuoc ve P-Guitar.</p>
-          <p>Thiet ke website chuyen nghiep.</p>
         </div>
       </footer>
     </div>
