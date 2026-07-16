@@ -2,40 +2,40 @@ import { useState } from 'react'
 import './App.css'
 
 const guitars = [
-  { id: 1, category: 'acoustic', name: 'Guitar Acoustic Classic', price: 4200000, discount: 15, image: 'src/assets/hero.png' },
-  { id: 2, category: 'electric', name: 'Guitar Dien Rock Pro', price: 8500000, discount: 0, image: 'src/assets/Guitar.jpg' },
+  { id: 1, category: 'acoustic', name: 'Guitar Acoustic Classic', price: 4200000, discount: 15, image: 'src/assets/Guitar.jpg' },
+  { id: 2, category: 'electric', name: 'Guitar Điện Rock Pro', price: 8500000, discount: 0, image: 'src/assets/Guitar.jpg' },
   { id: 3, category: 'ukulele', name: 'Ukulele Mini Travel', price: 1500000, discount: 20, image: 'src/assets/Guitar.jpg' },
-  { id: 4, category: 'acoustic', name: 'Guitar 12 Day Acoust', price: 5800000, discount: 0, image: 'src/assets/Guitar.jpg' },
-  { id: 5, category: 'accessories', name: 'Day dan chuyen nghiep', price: 320000, discount: 10, image: 'src/assets/Guitar.jpg' },
+  { id: 4, category: 'acoustic', name: 'Guitar 12 Dây Acoustic', price: 5800000, discount: 0, image: 'src/assets/Guitar.jpg' },
+  { id: 5, category: 'accessories', name: 'Dây đàn chuyên nghiệp', price: 320000, discount: 10, image: 'src/assets/Guitar.jpg' },
 ]
 
 const categories = [
   { name: 'Guitar Acoustic', slug: 'acoustic' },
-  { name: 'Guitar Dien', slug: 'electric' },
+  { name: 'Guitar Điện', slug: 'electric' },
   { name: 'Ukulele', slug: 'ukulele' },
-  { name: 'Phu Kien', slug: 'accessories' },
+  { name: 'Phụ Kiện', slug: 'accessories' },
 ]
 
-const productCategories = [{ name: 'Tat ca', slug: 'all' }, ...categories]
+const productCategories = [{ name: 'Tất cả', slug: 'all' }, ...categories]
 
 const blogPosts = [
   {
     id: 1,
-    title: 'Cach lua chon guitar cho nguoi moi bat dau',
+    title: 'Cách lựa chọn guitar cho người mới bắt đầu',
     date: '12/06/2026',
-    excerpt: 'Huong dan chon guitar phu hop theo phong cach, am thanh va ngan sach.',
+    excerpt: 'Hướng dẫn chọn guitar phù hợp theo phong cách, âm thanh và ngân sách.',
   },
   {
     id: 2,
-    title: 'Bao quan dan va phu kien dung cach',
+    title: 'Bảo quản đàn và phụ kiện đúng cách',
     date: '05/06/2026',
-    excerpt: 'Bi quyet giu cho dan luon sang dep, danh cho nhung ai yeu am nhac.',
+    excerpt: 'Bí quyết giữ cho đàn luôn sáng đẹp, dành cho những ai yêu âm nhạc.',
   },
   {
     id: 3,
-    title: 'Top nhung phu kien can co cho nguoi choi guitar',
+    title: 'Top những phụ kiện cần có cho người chơi guitar',
     date: '28/05/2026',
-    excerpt: 'Danh gia nhung phu kien tot nhat giup ban tap luyen va bieu dien',
+    excerpt: 'Đánh giá những phụ kiện tốt nhất giúp bạn tập luyện và biểu diễn.',
   },
 ]
 
@@ -68,7 +68,7 @@ function App() {
           </div>
           <div className="head-mid">
             <form className="search-bar" onSubmit={(e) => e.preventDefault()}>
-              <input type="text" className="tim" placeholder="Tìm kiếm" />
+              <input type="text" className="tim" placeholder="Tìm kiếm..." />
               <button type="submit" className="aicon">
                 <i className="fa fa-search"></i>
               </button>
@@ -94,15 +94,7 @@ function App() {
             </div>
           </div>
         </div>
-        <nav className="navbar-custom">
-          <div className="nav-items">
-            {categories.map((cat) => (
-              <a key={cat.slug} href="#" className="nav-link">
-                {cat.name}
-              </a>
-            ))}
-          </div>
-        </nav>
+        
       </header>
 
       {/* HERO */}
@@ -110,10 +102,9 @@ function App() {
         <div className="hero-content">
           <span className="hero-badge"><i className="fa fa-guitar"></i> P-Guitar</span>
           <h1 className="hero-title">Âm nhạc thăng hoa cùng cây đàn</h1>
-          <p className="hero-description">Kham pha bo suu tap guitar va phu kien cao cap. Mua ngay de nhan uu dai dac biet, giao nhanh va bao hanh.</p>
+          <p className="hero-description">Khám phá bộ sưu tập guitar và phụ kiện cao cấp. Mua ngay để nhận ưu đãi đặc biệt, giao nhanh và bảo hành uy tín.</p>
           <div className="hero-actions">
             <a href="#featured" className="hero-btn">Mua ngay</a>
-            <a href="#" className="hero-btn hero-btn-secondary">Phụ kiện hot</a>
           </div>
         </div>
       </section>
@@ -122,20 +113,20 @@ function App() {
       <section className="promo-strip">
         <div className="promo-card">
           <h2>ƯU ĐÃI FLASH SALE</h2>
-          <p>Giam toi 25% cho nhung cay dan guitar hot nhat. Giao nhanh trong 24h.</p>
+          <p>Giảm tới 25% cho những cây đàn guitar hot nhất. Giao nhanh trong 24h.</p>
         </div>
       </section>
 
       {/* CATEGORIES */}
       <section className="category-shelf">
         <div className="section-heading">
-          <h2>Danh muc <span>noi bat</span></h2>
+          <h2>Danh mục <span>nổi bật</span></h2>
         </div>
         <div className="category-grid">
           {categories.map((cat) => (
             <a key={cat.slug} href="#" className="category-card">
               <h3>{cat.name}</h3>
-              <p>Kham pha {cat.name.toLowerCase()}.</p>
+              <p>Khám phá {cat.name.toLowerCase()}.</p>
             </a>
           ))}
         </div>
@@ -144,29 +135,29 @@ function App() {
       {/* PRODUCT INTRO */}
       <section className="product-intro">
         <div className="section-heading">
-          <h2>Gioi thieu <span>san pham</span></h2>
-          <p>Khong chi la guitar, ma la trai nghiem am nhac chuyen nghiep voi san pham chat luong cao va phu kien hoan hao.</p>
+          <h2>Giới thiệu <span>sản phẩm</span></h2>
+          <p>Không chỉ là guitar, mà là trải nghiệm âm nhạc chuyên nghiệp với sản phẩm chất lượng cao và phụ kiện hoàn hảo.</p>
         </div>
         <div className="intro-grid">
           <article className="intro-card">
-            <h3>Am thanh tuyet voi</h3>
-            <p>Nhung cay dan duoc chon loc ky, thiet ke de mang den tiet tan am nhac trong treo va can doi.</p>
+            <h3>Âm thanh tuyệt vời</h3>
+            <p>Những cây đàn được chọn lọc kỹ, thiết kế để mang đến tiết tấu âm nhạc trong trẻo và cân đối.</p>
           </article>
           <article className="intro-card">
-            <h3>Chat luong cao cap</h3>
-            <p>Guitar va phu kien duoc cam ket dung vat lieu tot nhat, dam bao ben dep va on dinh.</p>
+            <h3>Chất lượng cao cấp</h3>
+            <p>Guitar và phụ kiện được cam kết dùng vật liệu tốt nhất, đảm bảo bền đẹp và ổn định.</p>
           </article>
           <article className="intro-card">
-            <h3>Trai nghiem khach hang</h3>
-            <p>Ho tro tu van chuyen nghiep va giao hang nhanh chong de ban co the bat dau tap ngay.</p>
+            <h3>Trải nghiệm khách hàng</h3>
+            <p>Hỗ trợ tư vấn chuyên nghiệp và giao hàng nhanh chóng để bạn có thể bắt đầu tập ngay.</p>
           </article>
         </div>
       </section>
 
-      {/* PRODUCTS - Class "product-grid" đã được đổi thành "products-section" để fix lỗi layout */}
+      {/* PRODUCTS */}
       <section id="featured" className="products-section">
         <div className="section-heading">
-          <h2>SAN PHAM <span>MOI</span></h2>
+          <h2>SẢN PHẨM <span>MỚI</span></h2>
         </div>
         <div className="filter-chips">
           {productCategories.map((cat) => (
@@ -185,7 +176,7 @@ function App() {
             filteredGuitars.map((guitar) => (
               <div key={guitar.id} className="product-card-wrapper">
                 <div className="sanpham-card">
-                  {guitar.discount > 0 && <div className="sale-badge">Giam {guitar.discount}%</div>}
+                  {guitar.discount > 0 && <div className="sale-badge">Giảm {guitar.discount}%</div>}
                   <img src={guitar.image} alt={guitar.name} className="picture" />
                   <div className="card-body">
                     <h5 className="card-title">{guitar.name}</h5>
@@ -200,14 +191,14 @@ function App() {
                       )}
                     </p>
                     <button className="add-to-cart-btn" onClick={handleAddToCart}>
-                      <i className="fa fa-cart-plus"></i> Them vao gio
+                      <i className="fa fa-cart-plus"></i> Thêm vào giỏ
                     </button>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <p className="no-results">Khong co san pham phu hop voi loai nay.</p>
+            <p className="no-results">Không có sản phẩm phù hợp với loại này.</p>
           )}
         </div>
       </section>
@@ -215,8 +206,8 @@ function App() {
       {/* BLOG */}
       <section className="blog-section">
         <div className="section-heading">
-          <h2>Blog <span>Am Nhac</span></h2>
-          <p>Cac bai viet moi nhat ve guitar, phu kien va kinh nghiem cho nguoi choi.</p>
+          <h2>Blog <span>Âm Nhạc</span></h2>
+          <p>Các bài viết mới nhất về guitar, phụ kiện và kinh nghiệm cho người chơi.</p>
         </div>
         <div className="blog-grid">
           {blogPosts.map((post) => (
@@ -226,7 +217,7 @@ function App() {
                 <h3>{post.title}</h3>
                 <p>{post.excerpt}</p>
               </div>
-              <a href="#" className="blog-readmore">Xem them</a>
+              <a href="#" className="blog-readmore">Xem thêm</a>
             </article>
           ))}
         </div>
@@ -239,41 +230,41 @@ function App() {
             <div className="logo-footer" style={{ width: '80%', height: '100%' }}>
               <img src="/src/assets/lg.png" alt="P-Guitar" />
             </div>
-            <p><strong>P-Guitar</strong> - Noi dam me am nhac thang hoa.</p>
-            <p>Dia chi: 180 Cao Lo, Ho Chi Minh City</p>
-            <p>Dien thoai: <a href="tel:0334090425">0334 090 425</a></p>
+            <p><strong>P-Guitar</strong> - Nơi đam mê âm nhạc thăng hoa.</p>
+            <p>Địa chỉ: 180 Cao Lỗ, TP. Hồ Chí Minh</p>
+            <p>Điện thoại: <a href="tel:0334090425">0334 090 425</a></p>
             <p>Email: <a href="mailto:shopguitar@gmail.com">shopguitar@gmail.com</a></p>
           </div>
           <div className="footer-column">
-            <h4>Dich vu khach hang</h4>
+            <h4>Dịch vụ khách hàng</h4>
             <ul>
-              <li>Ho tro 24/7</li>
-              <li>Doi tra nhanh chong</li>
-              <li>Giao hang toan quoc</li>
-              <li>Bao hanh tan tam</li>
+              <li>Hỗ trợ 24/7</li>
+              <li>Đổi trả nhanh chóng</li>
+              <li>Giao hàng toàn quốc</li>
+              <li>Bảo hành tận tâm</li>
             </ul>
           </div>
           <div className="footer-column">
-            <h4>Lien he</h4>
-            <p>Theo doi uu dai va nhan tu van.</p>
+            <h4>Liên hệ</h4>
+            <p>Theo dõi ưu đãi và nhận tư vấn.</p>
             <div className="social-icons">
               <a href="#"><img src="/src/assets/zalo.png" alt="Zalo" /></a>
               <a href="#"><img src="/src/assets/fb.png" alt="Facebook" /></a>
             </div>
           </div>
         </div>
-      <div className="map-container">
-  <iframe
-    src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d692.9560881472422!2d106.67791069626654!3d10.738214421796897!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1svi!2s!4v1781178970027!5m2!1svi!2s"
-    width="100%"
-    height="100%"
-    style={{ border: 0 }}
-    allowFullScreen=""
-    loading="lazy"
-    referrerPolicy="no-referrer-when-downgrade"
-    title="Bản đồ địa chỉ P-Guitar"
-  ></iframe>
-</div>
+        <div className="map-container">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d692.9560881472422!2d106.67791069626654!3d10.738214421796897!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1svi!2s!4v1781178970027!5m2!1svi!2s"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Bản đồ địa chỉ P-Guitar"
+          ></iframe>
+        </div>
       </footer>
     </div>
   )
