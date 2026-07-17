@@ -151,6 +151,22 @@
   border-color: rgba(255, 255, 255, 0.7);
 }
 
+.profile-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logout-btn {
+  border: none;
+  background: #fff7e8;
+  color: var(--brand-strong);
+  padding: 9px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
 .cart-icon-wrapper {
   position: relative;
 }
@@ -731,6 +747,102 @@
   margin: 0;
   color: #9ca3af;
   font-size: 0.85rem;
+}
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 16, 12, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.auth-modal {
+  width: min(100%, 480px);
+  background: #fff;
+  border-radius: 24px;
+  padding: 28px;
+  position: relative;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.auth-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  font-size: 1.7rem;
+  cursor: pointer;
+  color: #7a4f14;
+}
+
+.auth-modal h3 {
+  margin: 0 0 8px;
+  color: var(--brand-strong);
+}
+
+.auth-subtitle {
+  margin: 0 0 18px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-form input {
+  border: 1px solid rgba(199, 139, 47, 0.2);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+}
+
+.auth-submit-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #c78b2f, #7a4f14);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-error {
+  color: #b91c1c;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.auth-success {
+  color: #137a3f;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.auth-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.auth-switch button {
+  border: none;
+  background: transparent;
+  color: var(--brand);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
 }
 
 @media (max-width: 768px) {

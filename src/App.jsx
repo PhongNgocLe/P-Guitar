@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 const guitars = [
@@ -43,6 +43,20 @@ function App() {
   const [userLogged, setUserLogged] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authMode, setAuthMode] = useState('login')
+  const [authForm, setAuthForm] = useState({ username: '', password: '', fullname: '', email: '', phone: '', address: '' })
+  const [authMessage, setAuthMessage] = useState('')
+  const [authError, setAuthError] = useState('')
+  const [currentUser, setCurrentUser] = useState(null)
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('pguitar_user')
+    if (savedUser) {
+      setCurrentUser(JSON.parse(savedUser))
+      setUserLogged(true)
+    }
+  }, [])
 
   const handleAddToCart = () => {
     setCartCount(cartCount + 1)
@@ -50,6 +64,72 @@ function App() {
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
+  }
+
+  const openAuthModal = (mode = 'login') => {
+    setAuthMode(mode)
+    setAuthMessage('')
+    setAuthError('')
+    setShowAuthModal(true)
+  }
+
+  const closeAuthModal = () => {
+    setShowAuthModal(false)
+    setAuthForm({ username: '', password: '', fullname: '', email: '', phone: '', address: '' })
+    setAuthMessage('')
+    setAuthError('')
+  }
+
+  const handleAuthInputChange = (e) => {
+    setAuthForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault()
+    setAuthMessage('')
+    setAuthError('')
+
+    const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register'
+    const payload = authMode === 'login'
+      ? { username: authForm.username, password: authForm.password }
+      : authForm
+
+    try {
+      const response = await fetch('http://localhost:5000' + endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        setAuthError(data.message || 'Thao tác thất bại.')
+        return
+      }
+
+      if (authMode === 'login') {
+        setCurrentUser(data.user)
+        localStorage.setItem('pguitar_user', JSON.stringify(data.user))
+        setUserLogged(true)
+        setAuthMessage('Đăng nhập thành công!')
+        setTimeout(() => {
+          closeAuthModal()
+        }, 700)
+      } else {
+        setAuthMessage('Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.')
+        setAuthMode('login')
+        setAuthForm((prev) => ({ ...prev, username: prev.username, password: prev.password }))
+      }
+    } catch (error) {
+      setAuthError('Không thể kết nối server. Hãy chắc chắn backend đang chạy trên cổng 5000.')
+    }
+  }
+
+  const handleLogout = () => {
+    setCurrentUser(null)
+    setUserLogged(false)
+    localStorage.removeItem('pguitar_user')
   }
 
   const filteredGuitars = selectedCategory === 'all'
@@ -78,12 +158,15 @@ function App() {
               <a href="tel:0334090425" className="hotline-number">0334 090 425</a>
             </div>
             {!userLogged ? (
-              <a href="#" className="login-link" onClick={(e) => { e.preventDefault(); setUserLogged(true); }}>
+              <button type="button" className="login-link" onClick={() => openAuthModal('login')}>
                 <i className="fa fa-sign-in"></i> Đăng nhập
-              </a>
+              </button>
             ) : (
               <div className="profile-wrapper">
-                <button className="avatar-btn">P</button>
+                <button className="avatar-btn" title={currentUser?.fullname || currentUser?.username || 'User'}>
+                  {(currentUser?.fullname || currentUser?.username || 'U').charAt(0).toUpperCase()}
+                </button>
+                <button type="button" className="logout-btn" onClick={handleLogout}>Đăng xuất</button>
               </div>
             )}
             <div className="cart-icon-wrapper">
@@ -266,6 +349,64 @@ function App() {
           ></iframe>
         </div>
       </footer>
+
+      {showAuthModal && (
+        <div className="auth-overlay" onClick={closeAuthModal}>
+          <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="auth-close" onClick={closeAuthModal}>×</button>
+            <h3>{authMode === 'login' ? 'Đăng nhập' : 'Đăng ký'}</h3>
+            <p className="auth-subtitle">
+              {authMode === 'login'
+                ? 'Đăng nhập để tiếp tục mua sắm và theo dõi đơn hàng.'
+                : 'Tạo tài khoản để nhận ưu đãi và quản lý đơn hàng.'}
+            </p>
+            <form className="auth-form" onSubmit={handleAuthSubmit}>
+              <input
+                type="text"
+                name="username"
+                placeholder="Tên đăng nhập"
+                value={authForm.username}
+                onChange={handleAuthInputChange}
+                required
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="Mật khẩu"
+                value={authForm.password}
+                onChange={handleAuthInputChange}
+                required
+              />
+              {authMode === 'register' && (
+                <>
+                  <input type="text" name="fullname" placeholder="Họ và tên" value={authForm.fullname} onChange={handleAuthInputChange} />
+                  <input type="email" name="email" placeholder="Email" value={authForm.email} onChange={handleAuthInputChange} />
+                  <input type="text" name="phone" placeholder="Số điện thoại" value={authForm.phone} onChange={handleAuthInputChange} />
+                  <input type="text" name="address" placeholder="Địa chỉ" value={authForm.address} onChange={handleAuthInputChange} />
+                </>
+              )}
+              {authError && <p className="auth-error">{authError}</p>}
+              {authMessage && <p className="auth-success">{authMessage}</p>}
+              <button type="submit" className="auth-submit-btn">
+                {authMode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'}
+              </button>
+            </form>
+            <div className="auth-switch">
+              {authMode === 'login' ? (
+                <>
+                  <span>Chưa có tài khoản?</span>
+                  <button type="button" onClick={() => setAuthMode('register')}>Đăng ký ngay</button>
+                </>
+              ) : (
+                <>
+                  <span>Đã có tài khoản?</span>
+                  <button type="button" onClick={() => setAuthMode('login')}>Đăng nhập</button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
