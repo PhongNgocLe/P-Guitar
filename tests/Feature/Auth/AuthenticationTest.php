@@ -3,7 +3,6 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -23,12 +22,28 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->post('/login', [
-            'email' => $user->email,
+            'username' => $user->username,
             'password' => 'password',
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(RouteServiceProvider::HOME);
+        $response->assertRedirect('/');
+    }
+
+    public function test_admin_is_redirected_to_dashboard_after_login()
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $this->get('/account');
+
+        $response = $this->post('/login', [
+            'username' => $admin->username,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password()
@@ -36,10 +51,33 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $this->post('/login', [
-            'email' => $user->email,
+            'username' => $user->username,
             'password' => 'wrong-password',
         ]);
 
         $this->assertGuest();
+    }
+
+    public function test_authenticated_users_can_view_their_account()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/account');
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Account/Show')
+            ->where('auth.user.username', $user->username)
+        );
+    }
+
+    public function test_users_can_log_out()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/logout');
+
+        $this->assertGuest();
+        $response->assertRedirect('/');
     }
 }

@@ -1,120 +1,114 @@
 {
-  "_ApplicationLogo-K1KFIOs_.js": {
-    "file": "assets/ApplicationLogo-K1KFIOs_.js",
-    "name": "ApplicationLogo",
+  "_Guest-Bi_O0lK0.js": {
+    "file": "assets/Guest-Bi_O0lK0.js",
+    "name": "Guest",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_Guest-CNThHrSQ.js": {
-    "file": "assets/Guest-CNThHrSQ.js",
-    "name": "Guest",
-    "imports": [
-      "resources/js/app.jsx",
-      "_ApplicationLogo-K1KFIOs_.js"
-    ]
-  },
-  "_Label-IZSlg301.js": {
-    "file": "assets/Label-IZSlg301.js",
+  "_Label-C9GIbrau.js": {
+    "file": "assets/Label-C9GIbrau.js",
     "name": "Label",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_ValidationErrors-rh15U3oK.js": {
-    "file": "assets/ValidationErrors-rh15U3oK.js",
+  "_ValidationErrors-BcSoTF4W.js": {
+    "file": "assets/ValidationErrors-BcSoTF4W.js",
     "name": "ValidationErrors",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
+  "resources/js/Pages/Account/Show.jsx": {
+    "file": "assets/Show-CTO8723G.js",
+    "name": "Show",
+    "src": "resources/js/Pages/Account/Show.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
   "resources/js/Pages/Auth/ConfirmPassword.jsx": {
-    "file": "assets/ConfirmPassword-C8J_AuAv.js",
+    "file": "assets/ConfirmPassword-o3u4tTBd.js",
     "name": "ConfirmPassword",
     "src": "resources/js/Pages/Auth/ConfirmPassword.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-CNThHrSQ.js",
-      "_ValidationErrors-rh15U3oK.js",
-      "_Label-IZSlg301.js",
-      "_ApplicationLogo-K1KFIOs_.js"
+      "_Guest-Bi_O0lK0.js",
+      "_ValidationErrors-BcSoTF4W.js",
+      "_Label-C9GIbrau.js"
     ]
   },
   "resources/js/Pages/Auth/ForgotPassword.jsx": {
-    "file": "assets/ForgotPassword-DWOM_4ea.js",
+    "file": "assets/ForgotPassword-xVxzaWKb.js",
     "name": "ForgotPassword",
     "src": "resources/js/Pages/Auth/ForgotPassword.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-CNThHrSQ.js",
-      "_ValidationErrors-rh15U3oK.js",
-      "_ApplicationLogo-K1KFIOs_.js"
+      "_Guest-Bi_O0lK0.js",
+      "_ValidationErrors-BcSoTF4W.js"
     ]
   },
   "resources/js/Pages/Auth/Login.jsx": {
-    "file": "assets/Login-DMgVjKKE.js",
+    "file": "assets/Login-B7gPHNBL.js",
     "name": "Login",
     "src": "resources/js/Pages/Auth/Login.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-CNThHrSQ.js",
-      "_ValidationErrors-rh15U3oK.js",
-      "_Label-IZSlg301.js",
-      "_ApplicationLogo-K1KFIOs_.js"
+      "_Guest-Bi_O0lK0.js",
+      "_ValidationErrors-BcSoTF4W.js",
+      "_Label-C9GIbrau.js"
     ]
   },
   "resources/js/Pages/Auth/Register.jsx": {
-    "file": "assets/Register-DX2B53cF.js",
+    "file": "assets/Register-Cpx_G2PW.js",
     "name": "Register",
     "src": "resources/js/Pages/Auth/Register.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-CNThHrSQ.js",
-      "_ValidationErrors-rh15U3oK.js",
-      "_Label-IZSlg301.js",
-      "_ApplicationLogo-K1KFIOs_.js"
+      "_Guest-Bi_O0lK0.js",
+      "_ValidationErrors-BcSoTF4W.js",
+      "_Label-C9GIbrau.js"
     ]
   },
   "resources/js/Pages/Auth/ResetPassword.jsx": {
-    "file": "assets/ResetPassword-DXk9fVSK.js",
+    "file": "assets/ResetPassword-BUpLb75A.js",
     "name": "ResetPassword",
     "src": "resources/js/Pages/Auth/ResetPassword.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-CNThHrSQ.js",
-      "_ValidationErrors-rh15U3oK.js",
-      "_Label-IZSlg301.js",
-      "_ApplicationLogo-K1KFIOs_.js"
+      "_Guest-Bi_O0lK0.js",
+      "_ValidationErrors-BcSoTF4W.js",
+      "_Label-C9GIbrau.js"
     ]
   },
   "resources/js/Pages/Auth/VerifyEmail.jsx": {
-    "file": "assets/VerifyEmail-CDU9AX2S.js",
+    "file": "assets/VerifyEmail-CXLnzqce.js",
     "name": "VerifyEmail",
     "src": "resources/js/Pages/Auth/VerifyEmail.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-CNThHrSQ.js",
-      "_ApplicationLogo-K1KFIOs_.js"
+      "_Guest-Bi_O0lK0.js"
     ]
   },
   "resources/js/Pages/Dashboard.jsx": {
-    "file": "assets/Dashboard-CyJVJjpS.js",
+    "file": "assets/Dashboard-INrSedXZ.js",
     "name": "Dashboard",
     "src": "resources/js/Pages/Dashboard.jsx",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/app.jsx",
-      "_ApplicationLogo-K1KFIOs_.js"
+      "resources/js/app.jsx"
     ]
   },
   "resources/js/Pages/Welcome.jsx": {
-    "file": "assets/Welcome-Guw8lo0K.js",
+    "file": "assets/Welcome-Bi4Irqmi.js",
     "name": "Welcome",
     "src": "resources/js/Pages/Welcome.jsx",
     "isDynamicEntry": true,
@@ -123,11 +117,12 @@
     ]
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-0x8LihXl.js",
+    "file": "assets/app-B937oNUb.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
     "dynamicImports": [
+      "resources/js/Pages/Account/Show.jsx",
       "resources/js/Pages/Auth/ConfirmPassword.jsx",
       "resources/js/Pages/Auth/ForgotPassword.jsx",
       "resources/js/Pages/Auth/Login.jsx",
@@ -138,7 +133,7 @@
       "resources/js/Pages/Welcome.jsx"
     ],
     "css": [
-      "assets/app-CpEKsaTF.css"
+      "assets/app-DqhvewCe.css"
     ]
   }
 }

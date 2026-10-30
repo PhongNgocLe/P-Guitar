@@ -1,8 +1,10 @@
 <?php
 
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Models\Product;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\CheckoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,15 +19,33 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'products' => Product::all(),
+        'checkoutSuccess' => session('checkout_success'),
+        'checkoutOpen' => request()->query('checkout') === '1',
     ]);
 });
 
+Route::post('/checkout', [CheckoutController::class, 'store'])
+    ->middleware('auth')
+    ->name('checkout.store');
+Route::get('/checkout', function () {
+    return redirect('/?checkout=1');
+})->middleware('auth')->name('checkout');
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/products', [DashboardController::class, 'storeProduct'])->name('products.store');
+    Route::patch('/orders/{order}/status', [DashboardController::class, 'updateOrderStatus'])->name('orders.update-status');
+    Route::patch('/users/{user}', [DashboardController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{user}', [DashboardController::class, 'destroyUser'])->name('users.destroy');
+});
+
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    return redirect()->route('admin.dashboard');
+})->middleware(['auth', 'admin'])->name('dashboard');
+
+Route::get('/account', function () {
+    return Inertia::render('Account/Show');
+})->middleware('auth')->name('account.show');
 
 require __DIR__.'/auth.php';
