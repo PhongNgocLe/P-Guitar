@@ -45,6 +45,7 @@ class CheckoutTest extends TestCase
             'name' => 'Checkout Guitar',
             'category' => 'ACOUSTIC',
             'price' => 1250000,
+            'stock_quantity' => 6,
             'inStock' => true,
             'img' => '/storage/checkout-guitar.jpg',
         ]);
@@ -78,6 +79,11 @@ class CheckoutTest extends TestCase
             'quantity' => 2,
         ]);
         $this->assertDatabaseCount('orders', 3);
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock_quantity' => 0,
+            'inStock' => false,
+        ]);
     }
 
     public function test_checkout_requires_authentication_and_rejects_unavailable_payment_methods()
@@ -90,6 +96,7 @@ class CheckoutTest extends TestCase
             'name' => 'Checkout Guitar',
             'category' => 'ACOUSTIC',
             'price' => 1250000,
+            'stock_quantity' => 2,
             'inStock' => true,
             'img' => '/storage/checkout-guitar.jpg',
         ]);
@@ -107,5 +114,37 @@ class CheckoutTest extends TestCase
             ->assertSessionHasErrors('payment_method');
 
         $this->assertDatabaseCount('orders', 0);
+    }
+
+    public function test_checkout_rejects_orders_over_available_stock()
+    {
+        $customer = User::factory()->create();
+        $product = Product::query()->forceCreate([
+            'name' => 'Low Stock Guitar',
+            'category' => 'ACOUSTIC',
+            'price' => 1250000,
+            'stock_quantity' => 1,
+            'inStock' => true,
+            'img' => '/storage/low-stock-guitar.jpg',
+        ]);
+
+        $this->actingAs($customer)
+            ->from('/')
+            ->post(route('checkout.store'), [
+                'fullname' => 'Test Customer',
+                'phone' => '0901234567',
+                'address' => 'Ho Chi Minh City',
+                'payment_method' => 'COD',
+                'items' => [['product_id' => $product->id, 'quantity' => 2]],
+            ])
+            ->assertRedirect('/')
+            ->assertSessionHasErrors('items.0.product_id');
+
+        $this->assertDatabaseCount('orders', 0);
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock_quantity' => 1,
+            'inStock' => true,
+        ]);
     }
 }

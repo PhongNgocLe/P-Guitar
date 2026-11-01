@@ -1,0 +1,1 @@
+import{j as o}from"./app-CYRLvhiG.js";function a({forInput:e,value:t,className:r,children:m}){return o.jsx("label",{htmlFor:e,className:"block font-medium text-sm text-gray-700 "+r,children:t||m})}export{a as L};

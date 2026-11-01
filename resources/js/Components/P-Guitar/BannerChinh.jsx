@@ -5,7 +5,7 @@ export default function BannerChinh({ onOpenCustomModal }) {
         <section id="home" className="relative h-[850px] flex items-center justify-center text-center overflow-hidden pt-20">
             <div className="absolute inset-0 z-0">
                 <img 
-                    src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=2000&auto=format&fit=crop" 
+                    src="https://vn.images.search.yahoo.com/search/images;_ylt=A2RTexYTVeVqwAIAVVJtUwx.;_ylu=Y29sbwNhcC1zb3V0aGVhc3QtMQRwb3MDMzcEdnRpZAMEc2VjA3Ny?fr=mcafee&p=%E1%BA%A3nh+%C4%91ang+guitar+%C4%91%E1%BA%B9p+d%C3%B9ng+l%C3%A0m+banner&imgurl=https%3A%2F%2Fpng.pngtree.com%2Fthumb_back%2Ffw800%2Fbackground%2F20230605%2Fpngtree-acoustic-guitar-from-top-10-classical-guitars-free-download-image_2883882.jpg" 
                     alt="Hero Luxury Guitar" 
                     className="w-full h-full object-cover scale-105 transition-transform duration-[10000ms] ease-out hover:scale-100"
                 />

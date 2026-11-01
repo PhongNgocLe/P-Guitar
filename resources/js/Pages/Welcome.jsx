@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Head } from '@inertiajs/react';
 
 // Sử dụng đúng tên thư mục 'P-Guitar' có dấu gạch ngang
@@ -18,18 +18,43 @@ import TimKiemNhanh from '@/Components/P-Guitar/Modals/TimKiemNhanh';
 import XemNhanhSanPham from '@/Components/P-Guitar/Modals/XemNhanhSanPham';
 import DangKyCustom from '@/Components/P-Guitar/Modals/DangKyCustom';
 
-export default function Welcome({ products = [], auth = { user: null }, checkoutOpen = false, checkoutSuccess = null }) {
+function syncCartWithInventory(cart, products) {
+    const productsById = new Map(products.map((product) => [String(product.id), product]));
+    const quantities = new Map();
+
+    cart.forEach((item) => {
+        const product = productsById.get(String(item.id));
+        const quantity = Math.floor(Number(item.qty));
+        if (product && Number.isFinite(quantity) && quantity > 0) {
+            const available = Math.max(0, Number(product.stock_quantity) || 0);
+            quantities.set(String(product.id), Math.min(99, available, (quantities.get(String(product.id)) || 0) + quantity));
+        }
+    });
+
+    return Array.from(quantities, ([id, qty]) => ({
+        ...productsById.get(id),
+        qty,
+    })).filter((item) => item.qty > 0);
+}
+
+export default function Welcome({ products = [], categories = [], auth = { user: null }, checkoutOpen = false, checkoutSuccess = null }) {
     const danhSachSanPham = products;
 
     const [cart, setCart] = useState(() => {
         try {
             const storedCart = JSON.parse(window.localStorage.getItem('pguitar-cart') || '[]');
-            return Array.isArray(storedCart) ? storedCart : [];
+            return Array.isArray(storedCart) ? syncCartWithInventory(storedCart, products) : [];
         } catch (error) {
             console.error('Không thể đọc giỏ hàng đã lưu.', error);
             return [];
         }
     });
+    const cartRef = useRef(cart);
+    const updateCart = (nextCart) => {
+        const updatedCart = typeof nextCart === 'function' ? nextCart(cartRef.current) : nextCart;
+        cartRef.current = updatedCart;
+        setCart(updatedCart);
+    };
     const [wishlist, setWishlist] = useState([]);
     const [activeFilter, setActiveFilter] = useState('ALL');
     
@@ -52,6 +77,10 @@ export default function Welcome({ products = [], auth = { user: null }, checkout
     }, [cart]);
 
     useEffect(() => {
+        updateCart((currentCart) => syncCartWithInventory(currentCart, danhSachSanPham));
+    }, [danhSachSanPham]);
+
+    useEffect(() => {
         if (checkoutSuccess?.order_id) {
             window.localStorage.removeItem('pguitar-cart');
             triggerToast(`Đặt hàng #${checkoutSuccess.order_id} thành công.`);
@@ -65,14 +94,39 @@ export default function Welcome({ products = [], auth = { user: null }, checkout
     }, [checkoutOpen]);
 
     const addToCart = (product) => {
-        setCart(prev => {
-            const existing = prev.find(item => item.id === product.id);
-            if (existing) {
-                return prev.map(item => item.id === product.id ? { ...item, qty: item.qty + 1 } : item);
+        const currentProduct = danhSachSanPham.find((item) => String(item.id) === String(product.id));
+        const available = Math.max(0, Number(currentProduct?.stock_quantity) || 0);
+        const existing = cartRef.current.find((item) => String(item.id) === String(product.id));
+        const currentQuantity = existing?.qty || 0;
+
+        if (!currentProduct || currentQuantity >= available || currentQuantity >= 99) {
+            triggerToast(!currentProduct || available === 0
+                ? `"${product.name}" hiện đã hết hàng.`
+                : `Chỉ còn ${available} sản phẩm "${product.name}" trong kho.`);
+            return;
+        }
+
+        updateCart((currentCart) => {
+            const currentItem = currentCart.find((item) => String(item.id) === String(product.id));
+            if (currentItem) {
+                return currentCart.map((item) => String(item.id) === String(product.id)
+                    ? { ...currentProduct, qty: item.qty + 1 }
+                    : item);
             }
-            return [...prev, { ...product, qty: 1 }];
+
+            return [...currentCart, { ...currentProduct, qty: 1 }];
         });
-        triggerToast(`Đã thêm "${product.name}" vào giỏ hàng.`);
+        triggerToast(`Đã thêm "${currentProduct.name}" vào giỏ hàng.`);
+    };
+
+    const decreaseCartQuantity = (productId) => {
+        updateCart((currentCart) => currentCart.flatMap((item) => {
+            if (String(item.id) !== String(productId)) {
+                return [item];
+            }
+
+            return item.qty > 1 ? [{ ...item, qty: item.qty - 1 }] : [];
+        }));
     };
 
     const toggleWishlist = (product) => {
@@ -94,7 +148,7 @@ export default function Welcome({ products = [], auth = { user: null }, checkout
     return (
         <div className="min-h-screen bg-[#0B0B0B] text-[#F4F0E8] font-['Inter',sans-serif] selection:bg-[#D4AF37] selection:text-black antialiased relative">
             <Head>
-                <title>P-GUITAR LUXURY — Kiệt Tác Nhạc Cụ & Di Sản Âm Nhạc</title>
+                <title>P-GUITAR </title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet" />
@@ -121,9 +175,10 @@ export default function Welcome({ products = [], auth = { user: null }, checkout
 
             <BannerChinh onOpenCustomModal={() => setIsCustomModalOpen(true)} />
             <CamKetThuongHieu />
-            <LuoiDanhMuc onSelectCategory={(cat) => { setActiveFilter(cat); document.getElementById('store').scrollIntoView({ behavior: 'smooth' }); }} />
+            <LuoiDanhMuc categories={categories} onSelectCategory={(cat) => { setActiveFilter(cat); document.getElementById('store').scrollIntoView({ behavior: 'smooth' }); }} />
             <DanhSachSanPham 
                 products={filteredProducts}
+                categories={categories}
                 activeFilter={activeFilter}
                 setActiveFilter={setActiveFilter}
                 wishlist={wishlist}
@@ -143,14 +198,16 @@ export default function Welcome({ products = [], auth = { user: null }, checkout
                     setIsCheckoutOpen(true);
                 }}
                 cart={cart}
-                setCart={setCart}
+                setCart={updateCart}
+                onAddToCart={addToCart}
+                onDecreaseQuantity={decreaseCartQuantity}
                 formatVND={formatVND}
             />
             <ThanhToan
                 isOpen={isCheckoutOpen}
                 onClose={() => setIsCheckoutOpen(false)}
                 cart={cart}
-                setCart={setCart}
+                setCart={updateCart}
                 auth={auth}
                 formatVND={formatVND}
             />

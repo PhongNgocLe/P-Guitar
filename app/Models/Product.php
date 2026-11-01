@@ -20,6 +20,7 @@ class Product extends Model
         'price',
         'origPrice',
         'inStock',
+        'stock_quantity',
         'img',
         'specs',
     ];
@@ -28,7 +29,28 @@ class Product extends Model
         'price' => 'float',
         'origPrice' => 'float',
         'inStock' => 'boolean',
+        'stock_quantity' => 'integer',
     ];
+
+    public function getInStockAttribute($value)
+    {
+        if (array_key_exists('stock_quantity', $this->attributes)) {
+            return (int) $this->attributes['stock_quantity'] > 0;
+        }
+
+        return (bool) $value;
+    }
+
+    public function attributesToArray()
+    {
+        $attributes = parent::attributesToArray();
+
+        if (array_key_exists('stock_quantity', $this->attributes)) {
+            $attributes['inStock'] = (int) $this->attributes['stock_quantity'] > 0;
+        }
+
+        return $attributes;
+    }
 
     public function getSpecsAttribute($value)
     {

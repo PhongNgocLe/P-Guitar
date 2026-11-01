@@ -27,6 +27,7 @@ export default function TimKiemNhanh({ isOpen, onClose, products, onSelectProduc
                                     <div>
                                         <h4 className="text-sm font-semibold" style={{ fontFamily: "'Playfair Display', serif" }}>{p.name}</h4>
                                         <p className="text-xs text-[#D4AF37]">{formatVND(p.price)}</p>
+                                        {!p.inStock && <p className="mt-1 text-[10px] font-semibold uppercase text-red-400">Hết hàng</p>}
                                     </div>
                                 </div>
                             ))}

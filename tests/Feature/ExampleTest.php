@@ -30,6 +30,7 @@ class ExampleTest extends TestCase
             'tag' => 'TEST',
             'price' => 1000000,
             'origPrice' => null,
+            'stock_quantity' => 3,
             'inStock' => true,
             'img' => 'https://example.com/guitar.jpg',
             'specs' => 'Body: Mahogany',
@@ -39,6 +40,7 @@ class ExampleTest extends TestCase
 
         $response->assertInertia(fn ($page) => $page
             ->component('Welcome')
+            ->has('categories', 4)
             ->where('products.0.id', $product->id)
             ->where('products.0.name', 'Database guitar')
         );

@@ -16,6 +16,9 @@ export default function XemNhanhSanPham({ product, onClose, onAddToCart, formatV
                         <span className="text-[10px] uppercase tracking-widest text-[#D4AF37]">{product.tag}</span>
                         <h3 className="text-2xl font-normal mt-1 mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>{product.name}</h3>
                         <p className="text-xl font-bold text-[#D4AF37] mb-6">{formatVND(product.price)}</p>
+                        <p className={`mb-4 text-xs font-semibold uppercase tracking-widest ${product.inStock ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {product.inStock ? `Còn ${product.stock_quantity} sản phẩm` : 'Hết hàng'}
+                        </p>
                         <div className="space-y-2 text-xs text-[#9B9B9B] border-t border-b border-white/10 py-4 mb-6">
                             {product.specs && Object.entries(product.specs).map(([key, val]) => (
                                 <div key={key} className="flex justify-between">
@@ -27,9 +30,10 @@ export default function XemNhanhSanPham({ product, onClose, onAddToCart, formatV
                     </div>
                     <button 
                         onClick={() => { onAddToCart(product); onClose(); }}
-                        className="w-full py-3 bg-[#D4AF37] text-black font-bold text-xs uppercase tracking-widest"
+                        disabled={!product.inStock}
+                        className="w-full py-3 bg-[#D4AF37] text-black font-bold text-xs uppercase tracking-widest disabled:cursor-not-allowed disabled:bg-[#555] disabled:text-[#CCC]"
                     >
-                        THÊM VÀO GIỎ HÀNG
+                        {product.inStock ? 'THÊM VÀO GIỎ HÀNG' : 'HẾT HÀNG'}
                     </button>
                 </div>
             </div>

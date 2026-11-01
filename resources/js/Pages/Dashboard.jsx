@@ -4,7 +4,12 @@ import { Head, Link, useForm } from '@inertiajs/react';
 const fieldClass = 'mt-2 w-full border border-white/15 bg-[#0B0B0B] px-4 py-3 text-sm text-[#F4F0E8] outline-none transition focus:border-[#D4AF37]';
 const labelClass = 'block text-xs uppercase tracking-[0.16em] text-[#B8B1A2]';
 const goldButtonClass = 'inline-flex items-center justify-center bg-[#D4AF37] px-5 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-black transition hover:bg-[#E6C76A] disabled:cursor-not-allowed disabled:opacity-50';
-const statuses = ['Đang xử lý', 'Đang giao hàng', 'Đã giao', 'Đã hủy'];
+const nextOrderStatuses = {
+    'Đang xử lý': ['Đang giao hàng', 'Đã hủy'],
+    'Đang giao hàng': ['Đã giao'],
+    'Đã giao': [],
+    'Đã hủy': [],
+};
 const money = (value) => `${Number(value || 0).toLocaleString('vi-VN')}₫`;
 
 function SectionTitle({ eyebrow, children, detail }) {
@@ -57,11 +62,16 @@ function RevenueChart({ data }) {
 }
 
 function DeliveryRow({ order }) {
-    const statusForm = useForm({ status: order.status || 'Đang xử lý' });
+    const currentStatus = order.status || 'Đang xử lý';
+    const nextStatuses = nextOrderStatuses[currentStatus] || [];
+    const statusForm = useForm({ status: currentStatus });
 
     const updateStatus = (event) => {
         event.preventDefault();
-        statusForm.patch(route('admin.orders.update-status', order.id), { preserveScroll: true });
+        statusForm.patch(route('admin.orders.update-status', order.id), {
+            preserveScroll: true,
+            onError: () => statusForm.setData('status', currentStatus),
+        });
     };
 
     return (
@@ -82,14 +92,14 @@ function DeliveryRow({ order }) {
                         aria-label={`Trạng thái đơn hàng ${order.id}`}
                         value={statusForm.data.status}
                         onChange={(event) => statusForm.setData('status', event.target.value)}
-                        disabled={statusForm.processing}
+                        disabled={statusForm.processing || nextStatuses.length === 0}
                         className="border border-white/15 bg-[#0B0B0B] px-3 py-2 text-xs text-[#F4F0E8] focus:border-[#D4AF37] focus:outline-none"
                     >
-                        {statuses.map((status) => <option key={status} value={status}>{status}</option>)}
+                        {[currentStatus, ...nextStatuses].map((status) => <option key={status} value={status}>{status}</option>)}
                     </select>
                     <button
                         type="submit"
-                        disabled={statusForm.processing || statusForm.data.status === order.status}
+                        disabled={statusForm.processing || nextStatuses.length === 0 || statusForm.data.status === currentStatus}
                         className="text-xs uppercase tracking-wider text-[#D4AF37] hover:text-[#E6C76A] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                         {statusForm.processing ? 'Đang lưu…' : 'Cập nhật'}
@@ -155,7 +165,260 @@ function UserRow({ user, currentUserId }) {
     );
 }
 
-export default function Dashboard({ auth, products, users, orders, revenueChart, monthlyRevenue, pendingOrders, flash }) {
+function ProductRow({ product }) {
+    const deleteForm = useForm({});
+
+    const deleteProduct = () => {
+        if (window.confirm(`Xóa sản phẩm "${product.name}"? Thao tác này không thể hoàn tác.`)) {
+            deleteForm.delete(route('admin.products.destroy', product.id), { preserveScroll: true });
+        }
+    };
+
+    return (
+        <tr className="border-t border-white/10">
+            <td className="px-4 py-4 text-sm">{product.name}</td>
+            <td className="px-4 py-4 text-xs uppercase text-[#B8B1A2]">{product.category}</td>
+            <td className="px-4 py-4 text-sm text-[#D4AF37]">{money(product.price)}</td>
+            <td className="px-4 py-4 text-xs">
+                <span className="block text-[#F4F0E8]">{product.stock_quantity} chiếc</span>
+                <span className={product.inStock ? 'text-emerald-400' : 'text-red-400'}>{product.inStock ? 'Còn hàng' : 'Hết hàng'}</span>
+            </td>
+            <td className="px-4 py-4 text-right">
+                <button
+                    type="button"
+                    onClick={deleteProduct}
+                    disabled={deleteForm.processing}
+                    className="text-xs uppercase tracking-wider text-red-400 hover:text-red-300 disabled:opacity-40"
+                >
+                    {deleteForm.processing ? 'Đang xóa…' : 'Xóa'}
+                </button>
+                {deleteForm.errors.product && <p className="mt-2 text-xs text-red-400">{deleteForm.errors.product}</p>}
+            </td>
+        </tr>
+    );
+}
+
+function InventorySection({ products, stockReceipts }) {
+    const receiptForm = useForm({ items: [{ product_id: '', quantity: 1 }] });
+
+    const updateReceiptItem = (index, key, value) => {
+        receiptForm.setData('items', receiptForm.data.items.map((item, itemIndex) => (
+            itemIndex === index ? { ...item, [key]: value } : item
+        )));
+    };
+
+    const submitReceipt = (event) => {
+        event.preventDefault();
+        receiptForm.post(route('admin.inventory.receipts.store'), {
+            preserveScroll: true,
+            onSuccess: () => receiptForm.reset(),
+        });
+    };
+
+    return (
+        <section className="space-y-5">
+            <div className="border border-white/10 bg-[#151515] p-5 sm:p-7">
+                <SectionTitle eyebrow="Nhập hàng" detail="Mỗi phiếu nhập sẽ lưu thời gian và số lượng, sau đó cộng vào tồn kho hiện tại.">
+                    Lập phiếu nhập hàng
+                </SectionTitle>
+                <form onSubmit={submitReceipt} className="space-y-4">
+                    {receiptForm.data.items.map((item, index) => (
+                        <div key={index} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px_auto]">
+                            <label className={labelClass}>
+                                Sản phẩm
+                                <select
+                                    className={fieldClass}
+                                    value={item.product_id}
+                                    onChange={(event) => updateReceiptItem(index, 'product_id', event.target.value)}
+                                    required
+                                >
+                                    <option value="">Chọn sản phẩm</option>
+                                    {products.map((product) => (
+                                        <option key={product.id} value={product.id}>
+                                            {product.name} (tồn: {product.stock_quantity})
+                                        </option>
+                                    ))}
+                                </select>
+                                {receiptForm.errors[`items.${index}.product_id`] && (
+                                    <span className="mt-2 block text-xs text-red-400">{receiptForm.errors[`items.${index}.product_id`]}</span>
+                                )}
+                            </label>
+                            <label className={labelClass}>
+                                Số lượng nhập
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="2147483647"
+                                    className={fieldClass}
+                                    value={item.quantity}
+                                    onChange={(event) => updateReceiptItem(index, 'quantity', event.target.value)}
+                                    required
+                                />
+                                {receiptForm.errors[`items.${index}.quantity`] && (
+                                    <span className="mt-2 block text-xs text-red-400">{receiptForm.errors[`items.${index}.quantity`]}</span>
+                                )}
+                            </label>
+                            <div className="flex items-end">
+                                <button
+                                    type="button"
+                                    onClick={() => receiptForm.setData('items', receiptForm.data.items.filter((_, itemIndex) => itemIndex !== index))}
+                                    disabled={receiptForm.data.items.length === 1}
+                                    className="px-3 py-3 text-xs text-red-400 disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                    Xóa dòng
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    {receiptForm.errors.items && <p className="text-xs text-red-400">{receiptForm.errors.items}</p>}
+                    <div className="flex flex-wrap gap-3">
+                        <button
+                            type="button"
+                            onClick={() => receiptForm.setData('items', [...receiptForm.data.items, { product_id: '', quantity: 1 }])}
+                            disabled={receiptForm.processing || receiptForm.data.items.length >= 100}
+                            className="border border-[#D4AF37]/50 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#D4AF37] disabled:opacity-40"
+                        >
+                            Thêm sản phẩm vào phiếu
+                        </button>
+                        <button type="submit" className={goldButtonClass} disabled={receiptForm.processing || !products.length}>
+                            {receiptForm.processing ? 'Đang lưu…' : 'Lưu phiếu nhập'}
+                        </button>
+                    </div>
+                    {!products.length && <p className="text-xs text-[#9B9B9B]">Hãy thêm sản phẩm trước khi lập phiếu nhập.</p>}
+                </form>
+            </div>
+
+            <div className="border border-white/10 bg-[#151515] p-5 sm:p-7">
+                <SectionTitle eyebrow="Tồn kho">Số lượng sản phẩm hiện có</SectionTitle>
+                <div className="overflow-x-auto">
+                    <table className="w-full min-w-[560px] text-left">
+                        <thead className="text-[10px] uppercase tracking-[0.16em] text-[#9B9B9B]">
+                            <tr>
+                                <th className="px-4 py-3 font-medium">Sản phẩm</th>
+                                <th className="px-4 py-3 font-medium">Danh mục</th>
+                                <th className="px-4 py-3 text-right font-medium">Số lượng còn</th>
+                                <th className="px-4 py-3 text-right font-medium">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {products.map((product) => (
+                                <tr key={product.id} className="border-t border-white/10">
+                                    <td className="px-4 py-4 text-sm">{product.name}</td>
+                                    <td className="px-4 py-4 text-xs uppercase text-[#B8B1A2]">{product.category}</td>
+                                    <td className="px-4 py-4 text-right text-sm">{product.stock_quantity}</td>
+                                    <td className={`px-4 py-4 text-right text-xs ${product.inStock ? 'text-emerald-400' : 'text-red-400'}`}>
+                                        {product.inStock ? 'Còn hàng' : 'Hết hàng'}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    {!products.length && <p className="py-8 text-center text-sm text-[#9B9B9B]">Chưa có sản phẩm nào.</p>}
+                </div>
+            </div>
+
+            <div className="border border-white/10 bg-[#151515] p-5 sm:p-7">
+                <SectionTitle eyebrow="Lịch sử nhập kho">Các phiếu nhập đã lập</SectionTitle>
+                {stockReceipts.length ? (
+                    <div className="space-y-3">
+                        {stockReceipts.map((receipt) => (
+                            <details key={receipt.id} className="border border-white/10 px-4 py-3">
+                                <summary className="cursor-pointer text-sm">
+                                    <span className="text-[#D4AF37]">Phiếu nhập #{receipt.id}</span>
+                                    <span className="ml-3 text-xs text-[#9B9B9B]">
+                                        {new Date(receipt.received_at.replace(' ', 'T')).toLocaleString('vi-VN')}
+                                    </span>
+                                </summary>
+                                <ul className="mt-3 space-y-2 border-t border-white/10 pt-3 text-xs text-[#B8B1A2]">
+                                    {receipt.items.map((item, index) => (
+                                        <li key={`${receipt.id}-${index}`} className="flex justify-between gap-4">
+                                            <span>{item.product_name}</span>
+                                            <span className="whitespace-nowrap text-[#F4F0E8]">+{item.quantity}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </details>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="border border-dashed border-white/15 px-4 py-8 text-center text-sm text-[#9B9B9B]">Chưa có phiếu nhập hàng.</p>
+                )}
+            </div>
+        </section>
+    );
+}
+
+function CategoryRow({ category }) {
+    const deleteForm = useForm({});
+
+    const deleteCategory = () => {
+        if (window.confirm(`Xóa danh mục "${category.name}"?`)) {
+            deleteForm.delete(route('admin.categories.destroy', category.id), { preserveScroll: true });
+        }
+    };
+
+    return (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 py-4">
+            <div>
+                <p className="text-sm text-[#F4F0E8]">{category.name}</p>
+                <p className="mt-1 text-xs text-[#777]">{category.slug}</p>
+            </div>
+            <div className="text-right">
+                <button
+                    type="button"
+                    onClick={deleteCategory}
+                    disabled={deleteForm.processing}
+                    className="text-xs uppercase tracking-wider text-red-400 hover:text-red-300 disabled:opacity-40"
+                >
+                    {deleteForm.processing ? 'Đang xóa…' : 'Xóa'}
+                </button>
+                {deleteForm.errors.category && <p className="mt-2 text-xs text-red-400">{deleteForm.errors.category}</p>}
+            </div>
+        </div>
+    );
+}
+
+function CategorySection({ categories }) {
+    const categoryForm = useForm({ name: '' });
+
+    const submitCategory = (event) => {
+        event.preventDefault();
+        categoryForm.post(route('admin.categories.store'), {
+            preserveScroll: true,
+            onSuccess: () => categoryForm.reset(),
+        });
+    };
+
+    return (
+        <section className="border border-white/10 bg-[#151515] p-5 sm:p-7">
+            <SectionTitle eyebrow="Danh mục" detail="Danh mục đang có sản phẩm sẽ không thể xóa để tránh làm mất phân loại.">
+                Quản lý danh mục
+            </SectionTitle>
+            <form onSubmit={submitCategory} className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end">
+                <label className={`${labelClass} flex-1`}>
+                    Tên danh mục mới
+                    <input
+                        className={fieldClass}
+                        value={categoryForm.data.name}
+                        onChange={(event) => categoryForm.setData('name', event.target.value)}
+                        maxLength="100"
+                        required
+                    />
+                    {categoryForm.errors.name && <span className="mt-2 block text-xs text-red-400">{categoryForm.errors.name}</span>}
+                </label>
+                <button type="submit" className={goldButtonClass} disabled={categoryForm.processing}>
+                    {categoryForm.processing ? 'Đang lưu…' : 'Thêm danh mục'}
+                </button>
+            </form>
+            <div>
+                {categories.map((category) => <CategoryRow key={category.id} category={category} />)}
+                {!categories.length && <p className="py-5 text-sm text-[#9B9B9B]">Chưa có danh mục nào.</p>}
+            </div>
+        </section>
+    );
+}
+
+export default function Dashboard({ auth, products, categories, stockReceipts, users, orders, revenueChart, monthlyRevenue, pendingOrders, flash }) {
     const [activeSection, setActiveSection] = useState('overview');
     const productForm = useForm({
         name: '',
@@ -163,7 +426,6 @@ export default function Dashboard({ auth, products, users, orders, revenueChart,
         tag: '',
         price: '',
         origPrice: '',
-        inStock: true,
         img: null,
         specs: '',
     });
@@ -181,6 +443,8 @@ export default function Dashboard({ auth, products, users, orders, revenueChart,
         { id: 'overview', label: 'Tổng quan' },
         { id: 'shipping', label: `Giao hàng${pendingOrders ? ` (${pendingOrders})` : ''}` },
         { id: 'products', label: `Sản phẩm (${products.length})` },
+        { id: 'inventory', label: 'Quản lý kho' },
+        { id: 'categories', label: `Danh mục (${categories.length})` },
         { id: 'users', label: `Người dùng (${users.length})` },
     ];
 
@@ -289,7 +553,10 @@ export default function Dashboard({ auth, products, users, orders, revenueChart,
                                 </label>
                                 <label className={labelClass}>
                                     Danh mục *
-                                    <input className={fieldClass} value={productForm.data.category} onChange={(event) => productForm.setData('category', event.target.value.toUpperCase())} placeholder="ELECTRIC, ACOUSTIC..." required maxLength="100" />
+                                    <select className={fieldClass} value={productForm.data.category} onChange={(event) => productForm.setData('category', event.target.value)} required>
+                                        <option value="">Chọn danh mục</option>
+                                        {categories.map((category) => <option key={category.id} value={category.name}>{category.name}</option>)}
+                                    </select>
                                     {productForm.errors.category && <span className="mt-2 block text-xs text-red-400">{productForm.errors.category}</span>}
                                 </label>
                                 <label className={labelClass}>
@@ -312,10 +579,7 @@ export default function Dashboard({ auth, products, users, orders, revenueChart,
                                     <span className="mt-2 block normal-case tracking-normal text-[#777]">PNG, JPG hoặc WEBP, tối đa 5 MB.</span>
                                     {productForm.errors.img && <span className="mt-2 block text-xs text-red-400">{productForm.errors.img}</span>}
                                 </label>
-                                <label className="flex items-center gap-3 text-sm text-[#B8B1A2]">
-                                    <input type="checkbox" checked={productForm.data.inStock} onChange={(event) => productForm.setData('inStock', event.target.checked)} className="h-4 w-4 accent-[#D4AF37]" />
-                                    Đang còn hàng
-                                </label>
+                                <p className="text-xs text-[#9B9B9B]">Sản phẩm mới bắt đầu với tồn kho 0. Hãy lập phiếu nhập hàng trong mục Quản lý kho để cộng số lượng.</p>
                                 <label className={`${labelClass} sm:col-span-2`}>
                                     Thông số kỹ thuật
                                     <textarea className={`${fieldClass} min-h-24`} value={productForm.data.specs} onChange={(event) => productForm.setData('specs', event.target.value)} placeholder={'Body: Mahogany\nNeck: Maple'} maxLength="5000" />
@@ -332,18 +596,13 @@ export default function Dashboard({ auth, products, users, orders, revenueChart,
                         <div className="border border-white/10 bg-[#151515] p-5 sm:p-7">
                             <SectionTitle eyebrow="Kho hàng">{products.length} sản phẩm</SectionTitle>
                             <div className="overflow-x-auto">
-                                <table className="w-full min-w-[600px] text-left">
+                                <table className="w-full min-w-[700px] text-left">
                                     <thead className="text-[10px] uppercase tracking-[0.16em] text-[#9B9B9B]">
-                                        <tr><th className="px-4 py-3 font-medium">Sản phẩm</th><th className="px-4 py-3 font-medium">Danh mục</th><th className="px-4 py-3 font-medium">Giá</th><th className="px-4 py-3 font-medium">Tồn kho</th></tr>
+                                        <tr><th className="px-4 py-3 font-medium">Sản phẩm</th><th className="px-4 py-3 font-medium">Danh mục</th><th className="px-4 py-3 font-medium">Giá</th><th className="px-4 py-3 font-medium">Tồn kho</th><th className="px-4 py-3 text-right font-medium">Thao tác</th></tr>
                                     </thead>
                                     <tbody>
                                         {products.map((product) => (
-                                            <tr key={product.id} className="border-t border-white/10">
-                                                <td className="px-4 py-4 text-sm">{product.name}</td>
-                                                <td className="px-4 py-4 text-xs uppercase text-[#B8B1A2]">{product.category}</td>
-                                                <td className="px-4 py-4 text-sm text-[#D4AF37]">{money(product.price)}</td>
-                                                <td className="px-4 py-4 text-xs text-[#B8B1A2]">{product.inStock ? 'Còn hàng' : 'Hết hàng'}</td>
-                                            </tr>
+                                            <ProductRow key={product.id} product={product} />
                                         ))}
                                     </tbody>
                                 </table>
@@ -351,6 +610,14 @@ export default function Dashboard({ auth, products, users, orders, revenueChart,
                             </div>
                         </div>
                     </section>
+                )}
+
+                {activeSection === 'inventory' && (
+                    <InventorySection products={products} stockReceipts={stockReceipts} />
+                )}
+
+                {activeSection === 'categories' && (
+                    <CategorySection categories={categories} />
                 )}
 
                 {activeSection === 'users' && (

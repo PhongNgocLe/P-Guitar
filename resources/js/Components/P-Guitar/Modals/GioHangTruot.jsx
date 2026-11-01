@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function GioHangTruot({ isOpen, onClose, cart, setCart, formatVND, onCheckout }) {
+export default function GioHangTruot({ isOpen, onClose, cart, setCart, onAddToCart, onDecreaseQuantity, formatVND, onCheckout }) {
     if (!isOpen) return null;
     const totalCartPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
@@ -24,8 +24,28 @@ export default function GioHangTruot({ isOpen, onClose, cart, setCart, formatVND
                                         <div className="flex-1">
                                             <h4 className="text-xs font-semibold" style={{ fontFamily: "'Playfair Display', serif" }}>{item.name}</h4>
                                             <p className="text-xs text-[#D4AF37] mt-1">{formatVND(item.price)} x {item.qty}</p>
+                                            <div className="mt-2 flex items-center gap-3 text-xs">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onDecreaseQuantity(item.id)}
+                                                    aria-label={`Giảm số lượng ${item.name}`}
+                                                    className="border border-white/20 px-2 py-1 text-white hover:border-[#D4AF37]"
+                                                >
+                                                    −
+                                                </button>
+                                                <span>{item.qty} / {item.stock_quantity}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onAddToCart(item)}
+                                                    disabled={item.qty >= item.stock_quantity || item.qty >= 99}
+                                                    aria-label={`Tăng số lượng ${item.name}`}
+                                                    className="border border-white/20 px-2 py-1 text-white hover:border-[#D4AF37] disabled:cursor-not-allowed disabled:opacity-40"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
                                         </div>
-                                        <button onClick={() => setCart(cart.filter(i => i.id !== item.id))} className="text-red-400 text-xs hover:underline">Xóa</button>
+                                        <button onClick={() => setCart((currentCart) => currentCart.filter(i => i.id !== item.id))} className="text-red-400 text-xs hover:underline">Xóa</button>
                                     </div>
                                 ))
                             )}

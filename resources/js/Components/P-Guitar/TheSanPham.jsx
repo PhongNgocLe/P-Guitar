@@ -32,6 +32,11 @@ export default function TheSanPham({ product, isWishlist, onToggleWishlist, onQu
                         LIMITED
                     </span>
                 )}
+                {!product.inStock && (
+                    <span className="absolute bottom-3 left-3 bg-red-500/90 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-white">
+                        Hết hàng
+                    </span>
+                )}
             </div>
 
             <span className="text-[10px] uppercase tracking-[0.2em] text-[#9B9B9B] font-semibold">{product.tag}</span>
@@ -48,9 +53,10 @@ export default function TheSanPham({ product, isWishlist, onToggleWishlist, onQu
 
             <button 
                 onClick={() => onAddToCart(product)}
-                className="w-full py-3 bg-transparent hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black border border-[#D4AF37]/50 font-semibold text-[10px] uppercase tracking-[0.2em] transition-all duration-300"
+                disabled={!product.inStock}
+                className="w-full py-3 bg-transparent hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black border border-[#D4AF37]/50 font-semibold text-[10px] uppercase tracking-[0.2em] transition-all duration-300 disabled:cursor-not-allowed disabled:border-white/10 disabled:text-[#777] disabled:hover:bg-transparent disabled:hover:text-[#777]"
             >
-                THÊM VÀO GIỎ HÀNG
+                {product.inStock ? 'THÊM VÀO GIỎ HÀNG' : 'HẾT HÀNG'}
             </button>
         </div>
     );

@@ -3,6 +3,7 @@ import TheSanPham from './TheSanPham';
 
 export default function DanhSachSanPham({ 
     products, 
+    categories = [],
     activeFilter, 
     setActiveFilter, 
     wishlist, 
@@ -23,17 +24,17 @@ export default function DanhSachSanPham({
                     </div>
 
                     <div className="flex flex-wrap gap-3 border-b border-white/10 pb-2">
-                        {['ALL', 'ACOUSTIC', 'ELECTRIC', 'CUSTOM'].map((tab) => (
+                        {[{ name: 'TẤT CẢ', value: 'ALL' }, ...categories.map((category) => ({ name: category.name, value: category.name }))].map((tab) => (
                             <button
-                                key={tab}
-                                onClick={() => setActiveFilter(tab)}
+                                key={tab.value}
+                                onClick={() => setActiveFilter(tab.value)}
                                 className={`px-4 py-2 text-[11px] font-semibold tracking-[0.2em] uppercase transition-all ${
-                                    activeFilter === tab 
+                                    activeFilter === tab.value
                                         ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]' 
                                         : 'text-[#9B9B9B] hover:text-[#F4F0E8]'
                                 }`}
                             >
-                                {tab === 'ALL' ? 'TẤT CẢ' : tab}
+                                {tab.name}
                             </button>
                         ))}
                     </div>
