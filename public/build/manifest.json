@@ -1,27 +1,36 @@
 {
-  "_Guest-Cg9pPqkp.js": {
-    "file": "assets/Guest-Cg9pPqkp.js",
+  "_Guest-C-8nORI0.js": {
+    "file": "assets/Guest-C-8nORI0.js",
     "name": "Guest",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_Label-DNE983r2.js": {
-    "file": "assets/Label-DNE983r2.js",
+  "_Label-D-FIWOnR.js": {
+    "file": "assets/Label-D-FIWOnR.js",
     "name": "Label",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_ValidationErrors-CssFKJp3.js": {
-    "file": "assets/ValidationErrors-CssFKJp3.js",
+  "_ValidationErrors-g4RJqvkv.js": {
+    "file": "assets/ValidationErrors-g4RJqvkv.js",
     "name": "ValidationErrors",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
+  "resources/js/Pages/Account/Orders.jsx": {
+    "file": "assets/Orders-BgBRsQP-.js",
+    "name": "Orders",
+    "src": "resources/js/Pages/Account/Orders.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
   "resources/js/Pages/Account/Show.jsx": {
-    "file": "assets/Show-CMe3BVoQ.js",
+    "file": "assets/Show-DuaS024r.js",
     "name": "Show",
     "src": "resources/js/Pages/Account/Show.jsx",
     "isDynamicEntry": true,
@@ -30,76 +39,76 @@
     ]
   },
   "resources/js/Pages/Auth/ConfirmPassword.jsx": {
-    "file": "assets/ConfirmPassword-WM-tQ6Hh.js",
+    "file": "assets/ConfirmPassword--7XGdLxR.js",
     "name": "ConfirmPassword",
     "src": "resources/js/Pages/Auth/ConfirmPassword.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-Cg9pPqkp.js",
-      "_ValidationErrors-CssFKJp3.js",
-      "_Label-DNE983r2.js"
+      "_Guest-C-8nORI0.js",
+      "_ValidationErrors-g4RJqvkv.js",
+      "_Label-D-FIWOnR.js"
     ]
   },
   "resources/js/Pages/Auth/ForgotPassword.jsx": {
-    "file": "assets/ForgotPassword-BHQDi8zX.js",
+    "file": "assets/ForgotPassword-Cf9HOI3e.js",
     "name": "ForgotPassword",
     "src": "resources/js/Pages/Auth/ForgotPassword.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-Cg9pPqkp.js",
-      "_ValidationErrors-CssFKJp3.js"
+      "_Guest-C-8nORI0.js",
+      "_ValidationErrors-g4RJqvkv.js"
     ]
   },
   "resources/js/Pages/Auth/Login.jsx": {
-    "file": "assets/Login-BK38RCP1.js",
+    "file": "assets/Login-CqTpJVe2.js",
     "name": "Login",
     "src": "resources/js/Pages/Auth/Login.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-Cg9pPqkp.js",
-      "_ValidationErrors-CssFKJp3.js",
-      "_Label-DNE983r2.js"
+      "_Guest-C-8nORI0.js",
+      "_ValidationErrors-g4RJqvkv.js",
+      "_Label-D-FIWOnR.js"
     ]
   },
   "resources/js/Pages/Auth/Register.jsx": {
-    "file": "assets/Register-BWUcFAhz.js",
+    "file": "assets/Register-CWWEGNq8.js",
     "name": "Register",
     "src": "resources/js/Pages/Auth/Register.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-Cg9pPqkp.js",
-      "_ValidationErrors-CssFKJp3.js",
-      "_Label-DNE983r2.js"
+      "_Guest-C-8nORI0.js",
+      "_ValidationErrors-g4RJqvkv.js",
+      "_Label-D-FIWOnR.js"
     ]
   },
   "resources/js/Pages/Auth/ResetPassword.jsx": {
-    "file": "assets/ResetPassword-DF1f3tHv.js",
+    "file": "assets/ResetPassword-Cpm4BV1B.js",
     "name": "ResetPassword",
     "src": "resources/js/Pages/Auth/ResetPassword.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-Cg9pPqkp.js",
-      "_ValidationErrors-CssFKJp3.js",
-      "_Label-DNE983r2.js"
+      "_Guest-C-8nORI0.js",
+      "_ValidationErrors-g4RJqvkv.js",
+      "_Label-D-FIWOnR.js"
     ]
   },
   "resources/js/Pages/Auth/VerifyEmail.jsx": {
-    "file": "assets/VerifyEmail-Bvs9bEzp.js",
+    "file": "assets/VerifyEmail-C1biHfJV.js",
     "name": "VerifyEmail",
     "src": "resources/js/Pages/Auth/VerifyEmail.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Guest-Cg9pPqkp.js"
+      "_Guest-C-8nORI0.js"
     ]
   },
   "resources/js/Pages/Dashboard.jsx": {
-    "file": "assets/Dashboard-CmW8rVLT.js",
+    "file": "assets/Dashboard-BtU6Nv_z.js",
     "name": "Dashboard",
     "src": "resources/js/Pages/Dashboard.jsx",
     "isDynamicEntry": true,
@@ -107,8 +116,35 @@
       "resources/js/app.jsx"
     ]
   },
+  "resources/js/Pages/Payment/Result.jsx": {
+    "file": "assets/Result-rKeYG5RO.js",
+    "name": "Result",
+    "src": "resources/js/Pages/Payment/Result.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
+  "resources/js/Pages/Payment/VirtualWallet.jsx": {
+    "file": "assets/VirtualWallet-CC7qIavm.js",
+    "name": "VirtualWallet",
+    "src": "resources/js/Pages/Payment/VirtualWallet.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
+  "resources/js/Pages/Payment/WalletScan.jsx": {
+    "file": "assets/WalletScan-BTPjM4iq.js",
+    "name": "WalletScan",
+    "src": "resources/js/Pages/Payment/WalletScan.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
   "resources/js/Pages/Welcome.jsx": {
-    "file": "assets/Welcome-KgvwOHOX.js",
+    "file": "assets/Welcome-BdohDhJG.js",
     "name": "Welcome",
     "src": "resources/js/Pages/Welcome.jsx",
     "isDynamicEntry": true,
@@ -117,11 +153,12 @@
     ]
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-CYRLvhiG.js",
+    "file": "assets/app-ksIi0Nt2.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
     "dynamicImports": [
+      "resources/js/Pages/Account/Orders.jsx",
       "resources/js/Pages/Account/Show.jsx",
       "resources/js/Pages/Auth/ConfirmPassword.jsx",
       "resources/js/Pages/Auth/ForgotPassword.jsx",
@@ -130,10 +167,13 @@
       "resources/js/Pages/Auth/ResetPassword.jsx",
       "resources/js/Pages/Auth/VerifyEmail.jsx",
       "resources/js/Pages/Dashboard.jsx",
+      "resources/js/Pages/Payment/Result.jsx",
+      "resources/js/Pages/Payment/VirtualWallet.jsx",
+      "resources/js/Pages/Payment/WalletScan.jsx",
       "resources/js/Pages/Welcome.jsx"
     ],
     "css": [
-      "assets/app-DxF3PthD.css"
+      "assets/app-BZyzR9yB.css"
     ]
   }
 }

@@ -28,6 +28,9 @@ class DashboardController extends Controller
                 'fullname',
                 'phone',
                 'address',
+                'payment_method',
+                'payment_status',
+                'vnp_transaction_no',
                 'total_money',
                 'status',
                 'created_at',
@@ -309,26 +312,19 @@ class DashboardController extends Controller
         return redirect()->route('admin.dashboard')->with('success', 'Đã xóa sản phẩm.');
     }
 
-    public function updateUser(Request $request, User $user)
+    public function showUser(User $user)
     {
-        $validated = $request->validate([
-            'role' => ['required', Rule::in(['user', 'admin'])],
+        return response()->json([
+            'id' => $user->id,
+            'username' => $user->username,
+            'fullname' => $user->fullname ?? 'Chưa cập nhật',
+            'email' => $user->email ?? 'Chưa cập nhật',
+            'phone' => $user->phone ?? 'Chưa cập nhật',
+            'address' => $user->address ?? 'Chưa cập nhật',
+            'role' => $user->role,
+            'created_at' => $user->created_at ? $user->created_at->format('d/m/Y H:i') : 'N/A',
         ]);
-
-        if ($user->is($request->user()) && $validated['role'] !== 'admin') {
-            return back()->withErrors(['role' => 'Bạn không thể tự hạ quyền tài khoản đang đăng nhập.']);
-        }
-
-        if ($user->role === 'admin' && $validated['role'] !== 'admin' && $this->isLastAdmin($user)) {
-            return back()->withErrors(['role' => 'Không thể hạ quyền quản trị viên cuối cùng.']);
-        }
-
-        $user->role = $validated['role'];
-        $user->save();
-
-        return redirect()->route('admin.dashboard')->with('success', 'Đã cập nhật quyền người dùng.');
     }
-
     public function destroyUser(Request $request, User $user)
     {
         if ($user->is($request->user())) {

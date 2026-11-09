@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Services\VnpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class CheckoutController extends Controller
 {
@@ -18,7 +20,7 @@ class CheckoutController extends Controller
             'phone' => ['required', 'string', 'max:20'],
             'address' => ['required', 'string', 'max:255'],
             'note' => ['nullable', 'string', 'max:1000'],
-            'payment_method' => ['required', Rule::in(['COD', 'MoMo', 'QR Pay'])],
+            'payment_method' => ['required', Rule::in(['COD', 'MoMo', 'QR Pay', 'VNPAY', 'P-PAY'])],
             'items' => ['required', 'array', 'min:1', 'max:50'],
             'items.*.product_id' => ['required', 'integer', 'distinct', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:2147483647'],
@@ -63,13 +65,16 @@ class CheckoutController extends Controller
                 'phone' => $validated['phone'],
                 'address' => $validated['address'],
                 'note' => $validated['note'] ?? null,
-                'payment_method' => $validated['payment_method'],
+                'payment_method' => $validated['payment_method'] === 'P-PAY' ? 'Ví P-Pay' : $validated['payment_method'],
                 'total_money' => $total,
                 'status' => 'Đang xử lý',
                 'created_at' => now(),
             ];
             if (Schema::hasColumn('orders', 'stock_deducted')) {
                 $orderAttributes['stock_deducted'] = true;
+            }
+            if (Schema::hasColumn('orders', 'payment_status')) {
+                $orderAttributes['payment_status'] = 'unpaid';
             }
 
             $orderId = DB::table('orders')->insertGetId($orderAttributes);
@@ -94,6 +99,19 @@ class CheckoutController extends Controller
 
             return $orderId;
         });
+
+        // 1. Nếu chọn cổng thanh toán VNPAY
+        if ($validated['payment_method'] === 'VNPAY') {
+            $order = DB::table('orders')->where('id', $orderId)->first();
+            $vnpayUrl = app(VnpayService::class)->createPaymentUrl($order, $request->ip() ?: '127.0.0.1');
+
+            return Inertia::location($vnpayUrl);
+        }
+
+        // 2. Nếu chọn cổng Ví ảo P-Pay
+        if ($validated['payment_method'] === 'P-PAY') {
+            return Inertia::location(route('wallet.scan', ['order' => $orderId]));
+        }
 
         return redirect('/')->with('checkout_success', [
             'order_id' => $orderId,

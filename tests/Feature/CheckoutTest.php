@@ -24,6 +24,10 @@ class CheckoutTest extends TestCase
             $table->string('address', 255);
             $table->text('note')->nullable();
             $table->string('payment_method', 50)->nullable()->default('COD');
+            $table->string('payment_status', 50)->default('unpaid');
+            $table->string('vnp_transaction_no', 100)->nullable();
+            $table->string('vnp_bank_code', 50)->nullable();
+            $table->dateTime('paid_at')->nullable();
             $table->decimal('total_money', 10, 0);
             $table->string('status', 50)->nullable()->default('Đang xử lý');
             $table->dateTime('created_at')->nullable();
@@ -145,6 +149,99 @@ class CheckoutTest extends TestCase
             'id' => $product->id,
             'stock_quantity' => 1,
             'inStock' => true,
+        ]);
+    }
+
+    public function test_customer_can_checkout_with_vnpay_and_gets_redirected_to_gateway()
+    {
+        $customer = User::factory()->create();
+        $product = Product::query()->forceCreate([
+            'name' => 'VNPAY Guitar',
+            'category' => 'ACOUSTIC',
+            'price' => 2000000,
+            'stock_quantity' => 5,
+            'inStock' => true,
+            'img' => '/storage/vnpay-guitar.jpg',
+        ]);
+
+        $response = $this->actingAs($customer)
+            ->post(route('checkout.store'), [
+                'fullname' => 'Nguyen Van A',
+                'phone' => '0901234567',
+                'address' => '123 Le Loi, Q1',
+                'payment_method' => 'VNPAY',
+                'items' => [['product_id' => $product->id, 'quantity' => 1]],
+            ]);
+
+        $this->assertDatabaseHas('orders', [
+            'user_id' => $customer->id,
+            'payment_method' => 'VNPAY',
+            'total_money' => 2000000,
+            'status' => 'Đang xử lý',
+        ]);
+
+        $targetUrl = $response->headers->get('X-Inertia-Location') ?: $response->headers->get('Location');
+        $this->assertTrue(str_contains((string) $targetUrl, 'sandbox.vnpayment.vn'));
+    }
+
+    public function test_customer_can_checkout_with_virtual_wallet_and_process_payment()
+    {
+        $customer = User::factory()->create();
+        $product = Product::query()->forceCreate([
+            'name' => 'Virtual Wallet Guitar',
+            'category' => 'CLASSIC',
+            'price' => 3500000,
+            'stock_quantity' => 10,
+            'inStock' => true,
+            'img' => '/storage/wallet-guitar.jpg',
+        ]);
+
+        // 1. Khách đặt hàng chọn P-PAY
+        $response = $this->actingAs($customer)
+            ->post(route('checkout.store'), [
+                'fullname' => 'Tran Thi B',
+                'phone' => '0987654321',
+                'address' => '456 Nguyen Hue, Q1',
+                'payment_method' => 'P-PAY',
+                'items' => [['product_id' => $product->id, 'quantity' => 1]],
+            ]);
+
+        $this->assertDatabaseHas('orders', [
+            'user_id' => $customer->id,
+            'payment_method' => 'Ví P-Pay',
+            'payment_status' => 'unpaid',
+            'total_money' => 3500000,
+        ]);
+
+        $order = \Illuminate\Support\Facades\DB::table('orders')->where('user_id', $customer->id)->first();
+        $targetUrl = $response->headers->get('X-Inertia-Location') ?: $response->headers->get('Location');
+        $this->assertTrue(str_contains((string) $targetUrl, '/wallet/scan/' . $order->id));
+
+        // 2. Nhập mã PIN sai -> bị từ chối
+        $this->postJson(route('wallet.process'), [
+            'order_id' => $order->id,
+            'pin' => '000000',
+        ])->assertStatus(422);
+
+        // 3. Nhập đúng mã PIN 123456 -> trừ tiền thành công
+        $payResponse = $this->postJson(route('wallet.process'), [
+            'order_id' => $order->id,
+            'pin' => '123456',
+        ]);
+        $payResponse->assertStatus(200)->assertJson(['success' => true]);
+
+        // 4. Kiểm tra CSDL đã chuyển sang paid
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'payment_status' => 'paid',
+            'payment_method' => 'Ví P-Pay',
+        ]);
+
+        // 5. Polling API trả về paid
+        $statusResponse = $this->getJson(route('wallet.status', $order->id));
+        $statusResponse->assertStatus(200)->assertJson([
+            'id' => $order->id,
+            'payment_status' => 'paid',
         ]);
     }
 }

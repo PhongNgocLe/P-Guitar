@@ -82,7 +82,21 @@ function DeliveryRow({ order }) {
                 <p className="mt-1 text-xs text-[#9B9B9B]">{order.phone}</p>
             </td>
             <td className="max-w-56 px-4 py-4 text-xs leading-5 text-[#B8B1A2]">{order.address}</td>
-            <td className="whitespace-nowrap px-4 py-4 text-sm text-[#F4F0E8]">{money(order.total_money)}</td>
+            <td className="whitespace-nowrap px-4 py-4 text-sm text-[#F4F0E8]">
+                <p>{money(order.total_money)}</p>
+                <div className="mt-1.5">
+                    <span className={`inline-block rounded px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold ${
+                        order.payment_status === 'paid'
+                            ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-600/40'
+                            : 'bg-amber-950/80 text-amber-400 border border-amber-600/40'
+                    }`}>
+                        {order.payment_status === 'paid' ? `Đã TT · ${order.payment_method || 'VNPAY'}` : (order.payment_method || 'Chưa TT')}
+                    </span>
+                    {order.vnp_transaction_no && (
+                        <p className="mt-0.5 text-[9px] text-[#9B9B9B] font-mono">VNP: #{order.vnp_transaction_no}</p>
+                    )}
+                </div>
+            </td>
             <td className="whitespace-nowrap px-4 py-4 text-xs text-[#9B9B9B]">
                 {order.created_at ? new Date(order.created_at.replace(' ', 'T')).toLocaleDateString('vi-VN') : '—'}
             </td>
@@ -111,15 +125,9 @@ function DeliveryRow({ order }) {
     );
 }
 
-function UserRow({ user, currentUserId }) {
-    const roleForm = useForm({ role: user.role });
+function UserRow({ user, currentUserId, onViewUser }) {
     const deleteForm = useForm({});
     const isCurrentUser = user.id === currentUserId;
-
-    const updateRole = (event) => {
-        event.preventDefault();
-        roleForm.patch(route('admin.users.update', user.id), { preserveScroll: true });
-    };
 
     const deleteUser = () => {
         if (window.confirm(`Xóa tài khoản "${user.username}"? Thao tác này không thể hoàn tác.`)) {
@@ -130,30 +138,23 @@ function UserRow({ user, currentUserId }) {
     return (
         <tr className="border-t border-white/10 align-top">
             <td className="px-4 py-4">
-                <p className="font-medium text-[#F4F0E8]">{user.fullname || user.username}</p>
+                <button
+                    type="button"
+                    onClick={() => onViewUser(user)}
+                    className="text-left font-medium text-[#F4F0E8] hover:text-[#D4AF37] transition-colors"
+                >
+                    {user.fullname || user.username}
+                </button>
                 <p className="mt-1 text-xs text-[#9B9B9B]">@{user.username}</p>
             </td>
             <td className="px-4 py-4 text-sm text-[#B8B1A2]">
                 <p>{user.email || '—'}</p>
                 <p className="mt-1 text-xs">{user.phone || 'Chưa có số điện thoại'}</p>
             </td>
-            <td className="px-4 py-4">
-                <form onSubmit={updateRole} className="flex flex-wrap items-center gap-2">
-                    <select
-                        aria-label={`Quyền của ${user.username}`}
-                        value={roleForm.data.role}
-                        onChange={(event) => roleForm.setData('role', event.target.value)}
-                        disabled={isCurrentUser || roleForm.processing}
-                        className="border border-white/15 bg-[#0B0B0B] px-3 py-2 text-xs text-[#F4F0E8] focus:border-[#D4AF37] focus:outline-none disabled:opacity-60"
-                    >
-                        <option value="user">Người dùng</option>
-                        <option value="admin">Quản trị viên</option>
-                    </select>
-                    <button type="submit" disabled={isCurrentUser || roleForm.processing || roleForm.data.role === user.role} className="text-xs uppercase tracking-wider text-[#D4AF37] disabled:opacity-40">
-                        Lưu quyền
-                    </button>
-                    {roleForm.errors.role && <p className="basis-full text-xs text-red-400">{roleForm.errors.role}</p>}
-                </form>
+            <td className="px-4 py-4 text-sm text-[#B8B1A2]">
+                <span className={`inline-block px-2.5 py-1 text-xs uppercase tracking-wider ${user.role === 'admin' ? 'bg-[#D4AF37]/20 text-[#D4AF37]' : 'bg-white/5 text-[#F4F0E8]'}`}>
+                    {user.role === 'admin' ? 'Quản trị viên' : 'Người dùng'}
+                </span>
             </td>
             <td className="px-4 py-4 text-right">
                 <button type="button" onClick={deleteUser} disabled={isCurrentUser || deleteForm.processing} className="text-xs uppercase tracking-wider text-red-400 disabled:opacity-40">
@@ -164,7 +165,6 @@ function UserRow({ user, currentUserId }) {
         </tr>
     );
 }
-
 function ProductRow({ product }) {
     const deleteForm = useForm({});
 
@@ -420,6 +420,7 @@ function CategorySection({ categories }) {
 
 export default function Dashboard({ auth, products, categories, stockReceipts, users, orders, revenueChart, monthlyRevenue, pendingOrders, flash }) {
     const [activeSection, setActiveSection] = useState('overview');
+    const [viewingUser, setViewingUser] = useState(null);
     const productForm = useForm({
         name: '',
         category: '',
@@ -622,15 +623,66 @@ export default function Dashboard({ auth, products, categories, stockReceipts, u
 
                 {activeSection === 'users' && (
                     <section className="border border-white/10 bg-[#151515] p-5 sm:p-7">
-                        <SectionTitle eyebrow="Tài khoản" detail="Không thể xóa chính mình, quản trị viên cuối cùng hoặc tài khoản có đơn hàng.">Quản lý người dùng</SectionTitle>
+                        <SectionTitle eyebrow="Tài khoản" detail="Không thể xóa chính mình, quản trị viên cuối cùng hoặc tài khoản có đơn hàng. Bấm vào tên tài khoản để xem chi tiết.">Quản lý người dùng</SectionTitle>
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[680px] text-left">
                                 <thead className="text-[10px] uppercase tracking-[0.16em] text-[#9B9B9B]">
                                     <tr><th className="px-4 py-3 font-medium">Tài khoản</th><th className="px-4 py-3 font-medium">Liên hệ</th><th className="px-4 py-3 font-medium">Quyền</th><th className="px-4 py-3 font-medium text-right">Thao tác</th></tr>
                                 </thead>
-                                <tbody>{users.map((user) => <UserRow key={user.id} user={user} currentUserId={auth.user.id} />)}</tbody>
+                                <tbody>
+                                    {users.map((user) => (
+                                        <UserRow
+                                            key={user.id}
+                                            user={user}
+                                            currentUserId={auth.user.id}
+                                            onViewUser={setViewingUser}
+                                        />
+                                    ))}
+                                </tbody>
                             </table>
                         </div>
+                        {viewingUser && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+                                <div
+                                    role="dialog"
+                                    aria-modal="true"
+                                    aria-labelledby="user-detail-title"
+                                    className="w-full max-w-md border border-[#D4AF37]/40 bg-[#151515] p-6 text-[#F4F0E8] shadow-2xl"
+                                >
+                                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                                        <h3 id="user-detail-title" className="font-serif text-lg text-[#D4AF37]">Chi tiết tài khoản</h3>
+                                        <button
+                                            type="button"
+                                            onClick={() => setViewingUser(null)}
+                                            aria-label="Đóng"
+                                            className="text-xl font-bold text-gray-400 hover:text-white"
+                                        >
+                                            &times;
+                                        </button>
+                                    </div>
+
+                                    <div className="mt-4 space-y-3 text-sm">
+                                        <p><strong className="text-[#9B9B9B]">Tên đăng nhập:</strong> {viewingUser.username}</p>
+                                        <p><strong className="text-[#9B9B9B]">Họ và tên:</strong> {viewingUser.fullname || 'Chưa cập nhật'}</p>
+                                        <p><strong className="text-[#9B9B9B]">Email:</strong> {viewingUser.email || 'Chưa cập nhật'}</p>
+                                        <p><strong className="text-[#9B9B9B]">Số điện thoại:</strong> {viewingUser.phone || 'Chưa cập nhật'}</p>
+                                        <p><strong className="text-[#9B9B9B]">Địa chỉ:</strong> {viewingUser.address || 'Chưa cập nhật'}</p>
+                                        <p><strong className="text-[#9B9B9B]">Vai trò:</strong> <span className="uppercase text-[#D4AF37]">{viewingUser.role === 'admin' ? 'Quản trị viên' : 'Người dùng'}</span></p>
+                                        <p><strong className="text-[#9B9B9B]">Ngày tạo:</strong> {viewingUser.created_at ? new Date(viewingUser.created_at.replace(' ', 'T')).toLocaleString('vi-VN') : '—'}</p>
+                                    </div>
+
+                                    <div className="mt-6 border-t border-white/10 pt-4 text-right">
+                                        <button
+                                            type="button"
+                                            onClick={() => setViewingUser(null)}
+                                            className={goldButtonClass}
+                                        >
+                                            Đóng
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </section>
                 )}
             </main>
