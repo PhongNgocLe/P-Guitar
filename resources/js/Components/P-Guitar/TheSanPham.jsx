@@ -1,4 +1,5 @@
 import React from 'react';
+import { router } from '@inertiajs/react';
 
 export default function TheSanPham({ product, isWishlist, onToggleWishlist, onQuickView, onAddToCart, formatVND }) {
     return (
@@ -13,7 +14,7 @@ export default function TheSanPham({ product, isWishlist, onToggleWishlist, onQu
                     ♥
                 </button>
                 <button 
-                    onClick={() => onQuickView(product)}
+                    onClick={() => router.visit(route('product.show', product.id))}
                     className="w-9 h-9 bg-black/80 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:text-[#D4AF37] transition-colors text-xs"
                     title="Xem nhanh"
                 >
@@ -21,7 +22,7 @@ export default function TheSanPham({ product, isWishlist, onToggleWishlist, onQu
                 </button>
             </div>
 
-            <div className="h-72 overflow-hidden mb-6 bg-[#151515] flex items-center justify-center relative cursor-pointer" onClick={() => onQuickView(product)}>
+            <div className="h-72 overflow-hidden mb-6 bg-[#151515] flex items-center justify-center relative cursor-pointer" onClick={() => router.visit(route('product.show', product.id))}>
                 <img 
                     src={product.img} 
                     alt={product.name} 
@@ -40,7 +41,7 @@ export default function TheSanPham({ product, isWishlist, onToggleWishlist, onQu
             </div>
 
             <span className="text-[10px] uppercase tracking-[0.2em] text-[#9B9B9B] font-semibold">{product.tag}</span>
-            <h3 className="font-normal text-lg mt-1 mb-2 text-[#F4F0E8] group-hover:text-[#D4AF37] transition-colors cursor-pointer" onClick={() => onQuickView(product)} style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h3 className="font-normal text-lg mt-1 mb-2 text-[#F4F0E8] group-hover:text-[#D4AF37] transition-colors cursor-pointer" onClick={() => router.visit(route('product.show', product.id))} style={{ fontFamily: "'Playfair Display', serif" }}>
                 {product.name}
             </h3>
             

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from '@inertiajs/react';
+import ChatBot from '@/Components/ChatBot';
 
 export default function ThanhDieuHuong({ 
     cartCount, 
@@ -34,7 +35,7 @@ export default function ThanhDieuHuong({
                         <a href="#store" className="hover:text-[#D4AF37] transition-colors">Cửa hàng</a>
                         <a href="#collections" className="hover:text-[#D4AF37] transition-colors">Bộ sưu tập</a>
                         <button onClick={onOpenCustomModal} className="hover:text-[#D4AF37] transition-colors uppercase">Custom Shop</button>
-                        <a href="#about" className="hover:text-[#D4AF37] transition-colors">Về chúng tôi</a>
+                        <Link href="/about" className="hover:text-[#D4AF37] transition-colors">Về chúng tôi</Link>
                     </nav>
                     
                     {/* Action Icons */}
@@ -119,7 +120,19 @@ export default function ThanhDieuHuong({
                         </button>
                     </div>
                 </div>
+                {isMobileMenuOpen && (
+                    <nav className="border-t border-white/10 bg-[#0B0B0B] px-6 py-4 lg:hidden" aria-label="Điều hướng di động">
+                        <div className="mx-auto flex max-w-[1440px] flex-col gap-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#F4F0E8]/80">
+                            <a href="#home" onClick={() => setIsMobileMenuOpen(false)} className="py-3 hover:text-[#D4AF37]">Trang chủ</a>
+                            <a href="#store" onClick={() => setIsMobileMenuOpen(false)} className="py-3 hover:text-[#D4AF37]">Cửa hàng</a>
+                            <a href="#collections" onClick={() => setIsMobileMenuOpen(false)} className="py-3 hover:text-[#D4AF37]">Bộ sưu tập</a>
+                            <button type="button" onClick={() => { setIsMobileMenuOpen(false); onOpenCustomModal(); }} className="py-3 text-left uppercase hover:text-[#D4AF37]">Custom Shop</button>
+                            <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="py-3 text-[#D4AF37]">Về chúng tôi</Link>
+                        </div>
+                    </nav>
+                )}
             </header>
-        </>
+        <ChatBot />
+    </>
     );
 }

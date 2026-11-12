@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '@inertiajs/react';
 
 export default function ChanTrang({ onOpenCustomModal }) {
     return (
@@ -16,8 +17,8 @@ export default function ChanTrang({ onOpenCustomModal }) {
                 <div>
                     <h4 className="text-[#F4F0E8] font-semibold mb-5 uppercase text-[11px] tracking-[0.2em]">CỬA HÀNG</h4>
                     <ul className="space-y-3 font-light">
-                        <li><a href="#store" className="hover:text-[#D4AF37] transition-colors">Guitar Acoustic</a></li>
-                        <li><a href="#store" className="hover:text-[#D4AF37] transition-colors">Guitar Electric</a></li>
+                        <li><a href="/#store" className="hover:text-[#D4AF37] transition-colors">Guitar Acoustic</a></li>
+                        <li><a href="/#store" className="hover:text-[#D4AF37] transition-colors">Guitar Electric</a></li>
                         <li><button onClick={onOpenCustomModal} className="hover:text-[#D4AF37] transition-colors text-left">Custom Shop</button></li>
                     </ul>
                 </div>
@@ -25,17 +26,17 @@ export default function ChanTrang({ onOpenCustomModal }) {
                 <div>
                     <h4 className="text-[#F4F0E8] font-semibold mb-5 uppercase text-[11px] tracking-[0.2em]">HỖ TRỢ</h4>
                     <ul className="space-y-3 font-light">
-                        <li><a href="#policy" className="hover:text-[#D4AF37] transition-colors">Chính Sách Bảo Hành</a></li>
-                        <li><a href="#shipping" className="hover:text-[#D4AF37] transition-colors">Vận Chuyển & Giao Hàng</a></li>
-                        <li><a href="#contact" className="hover:text-[#D4AF37] transition-colors">Liên Hệ Tư Vấn</a></li>
+                        <li><Link href="/about#return-policy" className="hover:text-[#D4AF37] transition-colors">Chính Sách Đổi Trả</Link></li>
+                        <li><Link href="/about#shipping-policy" className="hover:text-[#D4AF37] transition-colors">Chính Sách Giao Hàng</Link></li>
+                        <li><Link href="/about#warranty-policy" className="hover:text-[#D4AF37] transition-colors">Chính Sách Bảo Hành</Link></li>
+                        <li><Link href="/about#store-story" className="hover:text-[#D4AF37] transition-colors">Về P-Guitar</Link></li>
                     </ul>
                 </div>
 
                 <div>
                     <h4 className="text-[#F4F0E8] font-semibold mb-5 uppercase text-[11px] tracking-[0.2em]">SHOWROOM</h4>
-                    <p className="font-light leading-relaxed mb-2">123 Đường Nguyễn Trãi, Quận 1, TP. Hồ Chí Minh</p>
-                    <p className="font-light mb-1">Hotline: <span className="text-[#F4F0E8]">1900 xxxx xxxx</span></p>
-                    <p className="font-light">Email: <span className="text-[#F4F0E8]">contact@pguitar.vn</span></p>
+                    <p className="font-light leading-relaxed mb-2">Tư vấn lựa chọn guitar và hỗ trợ thông tin sản phẩm.</p>
+                    <p className="font-light">Thông tin liên hệ được xác nhận cùng đơn hàng.</p>
                 </div>
             </div>
 

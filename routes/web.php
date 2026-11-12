@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Models\Product;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentController;
@@ -34,12 +35,21 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/about', function () {
+    return Inertia::render('About');
+})->name('about');
+
+
 Route::post('/checkout', [CheckoutController::class, 'store'])
     ->middleware('auth')
     ->name('checkout.store');
 Route::get('/checkout', function () {
     return redirect('/?checkout=1');
 })->middleware('auth')->name('checkout');
+
+// Trang chi tiết sản phẩm
+Route::get('/product/{product}', [ProductController::class, 'show'])
+    ->name('product.show');
 
 // Cổng thanh toán VNPAY
 Route::get('/vnpay/return', [PaymentController::class, 'vnpayReturn'])->name('vnpay.return');
@@ -65,6 +75,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/admin/users/{user}', [DashboardController::class, 'showUser'])->name('admin.users.show');
 });
 
+
 Route::get('/dashboard', function () {
     return redirect()->route('admin.dashboard');
 })->middleware(['auth', 'admin'])->name('dashboard');
@@ -80,5 +91,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/account/orders', [CustomerOrderController::class, 'index'])->name('account.orders');
     Route::post('/account/orders/{order}/cancel', [CustomerOrderController::class, 'cancel'])->name('account.orders.cancel');
 });
+
 
 require __DIR__.'/auth.php';
